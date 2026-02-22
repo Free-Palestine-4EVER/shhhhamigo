@@ -623,3 +623,8 @@ button.col-span-2 {
 .overflow-auto {
   -webkit-overflow-scrolling: touch;
 }
+/* Force all dialog/modal portals above secret chat overlay */
+[data-radix-portal] {
+  z-index: 99999 !important;
+  position: relative;
+}

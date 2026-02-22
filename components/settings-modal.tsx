@@ -555,7 +555,7 @@ export default function SettingsModal({ isOpen, onClose, user, activeTab = "prof
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white border-gray-800">
+      <DialogContent className="sm:max-w-[425px] bg-gray-900 text-white border-gray-800" style={{ zIndex: 99999 }}>
         <DialogHeader className="flex flex-row items-center justify-between">
           <DialogTitle className="text-xl font-bold">Settings</DialogTitle>
           <Button

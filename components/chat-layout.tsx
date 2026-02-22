@@ -783,7 +783,7 @@ export default function ChatLayout({ selectedServer, theme }: ChatLayoutProps) {
         </div>
       </div>
 
-      {isSettingsOpen && currentUser && typeof document !== 'undefined' && createPortal(
+      {isSettingsOpen && currentUser && (
         <SettingsModal
           user={currentUser}
           isOpen={isSettingsOpen}
@@ -804,8 +804,7 @@ export default function ChatLayout({ selectedServer, theme }: ChatLayoutProps) {
               })
             }
           }}
-        />,
-        document.body
+        />
       )}
 
     </div>

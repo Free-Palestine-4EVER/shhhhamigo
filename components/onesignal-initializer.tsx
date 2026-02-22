@@ -62,18 +62,18 @@ export default function OneSignalInitializer() {
               timeDelay: 0,
               pageViews: 0,
               customizeTextEnabled: true,
-              actionMessage: "Subscribe to Shhhhh Chat notifications for the latest updates.",
+              actionMessage: "Subscribe to Domaći Sokovi notifications for the latest updates.",
               acceptButtonText: "Subscribe",
               cancelButtonText: "Later",
             },
           },
-          androidChannelId: "shhhhh-chat-channel",
-          androidChannelName: "Shhhhh Chat",
-          androidChannelDescription: "Notifications from Shhhhh Chat",
+          androidChannelId: "domacisokovi-channel",
+          androidChannelName: "Domaći Sokovi",
+          androidChannelDescription: "Notifications from Domaći Sokovi",
         })
 
         window.OneSignal.push(() => {
-          window.OneSignal.setDefaultTitle("Shhhhh Chat")
+          window.OneSignal.setDefaultTitle("Domaći Sokovi")
 
           if (navigator.serviceWorker && navigator.serviceWorker.controller) {
             navigator.serviceWorker.ready.then((registration) => {
@@ -81,7 +81,7 @@ export default function OneSignalInitializer() {
               registration.active?.postMessage({
                 command: "setNotificationSettings",
                 options: {
-                  applicationName: "Shhhhh Chat",
+                  applicationName: "Domaći Sokovi",
                   applicationIcon: "https://www.shhhhh.chat/logo.png",
                 },
               })
@@ -91,9 +91,9 @@ export default function OneSignalInitializer() {
 
         if (window.OneSignal.createNotificationChannel) {
           window.OneSignal.createNotificationChannel({
-            id: "shhhhh-chat-channel",
-            name: "Shhhhh Chat",
-            description: "Notifications from Shhhhh Chat",
+            id: "domacisokovi-channel",
+            name: "Domaći Sokovi",
+            description: "Notifications from Domaći Sokovi",
             importance: 4,
             vibration: true,
             sound: "default",
@@ -101,7 +101,7 @@ export default function OneSignalInitializer() {
         }
 
         window.OneSignal.setDefaultNotificationUrl("https://www.shhhhh.chat")
-        window.OneSignal.setDefaultTitle("Shhhhh Chat")
+        window.OneSignal.setDefaultTitle("Domaći Sokovi")
 
         window.OneSignal.isPushNotificationsEnabled((isEnabled: boolean) => {
           console.log("OneSignal Push Notifications are enabled:", isEnabled)

@@ -42,19 +42,19 @@ export async function POST(request: Request) {
       include_external_user_ids: [userId],
       headings: { en: title },
       contents: { en: message },
-      url: url || `https://www.shhhhh.chat`,
-      chrome_web_icon: icon || "https://www.shhhhh.chat/logo.png", // Always use Shhhhh Chat icon
-      firefox_icon: "https://www.shhhhh.chat/logo.png",
-      chrome_web_image: "https://www.shhhhh.chat/logo.png",
+      url: url || `https://www.domacisokovi.com`,
+      chrome_web_icon: icon || "https://www.domacisokovi.com/logo.png", // Always use Domaći Sokovi icon
+      firefox_icon: "https://www.domacisokovi.com/logo.png",
+      chrome_web_image: "https://www.domacisokovi.com/logo.png",
       data: data || {},
       // Override app name for notifications
-      name: "Shhhhh Chat", // Set app name to Shhhhh Chat for notifications
+      name: "Domaći Sokovi", // Set app name to Domaći Sokovi for notifications
       // Add buttons to allow quick actions
       web_buttons: [
         {
           id: "view",
           text: "View",
-          url: url || `https://www.shhhhh.chat`,
+          url: url || `https://www.domacisokovi.com`,
         },
       ],
       // Make notification more prominent

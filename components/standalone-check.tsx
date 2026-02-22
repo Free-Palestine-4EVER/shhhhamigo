@@ -28,7 +28,7 @@ export default function StandaloneCheck({ children }: { children: React.ReactNod
   return (
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-6 z-50">
       <div className="max-w-md w-full bg-gray-900 rounded-lg p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold text-white mb-4">Install Shhhhh to Home Screen</h1>
+        <h1 className="text-2xl font-bold text-white mb-4">Install Domaći Sokovi to Home Screen</h1>
 
         <div className="bg-gray-800 p-4 rounded-lg mb-6 w-full">
           <ol className="list-decimal pl-5 text-gray-300 space-y-6">

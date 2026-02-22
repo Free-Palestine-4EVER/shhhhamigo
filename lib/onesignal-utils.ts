@@ -75,7 +75,7 @@ export async function sendMessageNotification(
     const formattedMessage = formatMessagePreview(messagePreview)
 
     // Get the current origin
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.shhhhh.chat"
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://www.domacisokovi.com"
 
     // Prepare the notification payload
     const payload = {
@@ -158,10 +158,10 @@ export async function sendNotificationToUser(
         url,
         data,
         // Override app name and icon for notifications
-        name: "Shhhhh Chat",
-        chrome_web_icon: "https://www.shhhhh.chat/logo.png",
-        firefox_icon: "https://www.shhhhh.chat/logo.png",
-        chrome_web_image: "https://www.shhhhh.chat/logo.png",
+        name: "Domaći Sokovi",
+        chrome_web_icon: "https://www.domacisokovi.com/logo.png",
+        firefox_icon: "https://www.domacisokovi.com/logo.png",
+        chrome_web_image: "https://www.domacisokovi.com/logo.png",
       }),
     })
 
@@ -194,10 +194,10 @@ export async function sendNotificationToAll(title: string, message: string, url 
         url,
         data,
         // Override app name and icon for notifications
-        name: "Shhhhh Chat",
-        chrome_web_icon: "https://www.shhhhh.chat/logo.png",
-        firefox_icon: "https://www.shhhhh.chat/logo.png",
-        chrome_web_image: "https://www.shhhhh.chat/logo.png",
+        name: "Domaći Sokovi",
+        chrome_web_icon: "https://www.domacisokovi.com/logo.png",
+        firefox_icon: "https://www.domacisokovi.com/logo.png",
+        chrome_web_image: "https://www.domacisokovi.com/logo.png",
       }),
     })
 

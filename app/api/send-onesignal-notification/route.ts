@@ -13,24 +13,24 @@ export async function POST(request: Request) {
       app_id: "e6858309-3010-4b12-8641-792d690e8ee3",
       headings: { en: title },
       contents: { en: message },
-      url: url || "https://www.shhhhh.chat",
-      chrome_web_icon: "https://www.shhhhh.chat/logo.png", // Always use Shhhhh Chat icon
-      firefox_icon: "https://www.shhhhh.chat/logo.png",
-      chrome_web_image: "https://www.shhhhh.chat/logo.png",
+      url: url || "https://www.domacisokovi.com",
+      chrome_web_icon: "https://www.domacisokovi.com/logo.png", // Always use Domaći Sokovi icon
+      firefox_icon: "https://www.domacisokovi.com/logo.png",
+      chrome_web_image: "https://www.domacisokovi.com/logo.png",
       // These are the correct parameters to override the app name in notifications
-      android_channel_id: "shhhhh-chat-channel",
-      android_group: "shhhhh-chat",
-      android_group_message: { en: "New messages from Shhhhh Chat" },
-      existing_android_channel_id: "shhhhh-chat-channel",
+      android_channel_id: "domacisokovi-channel",
+      android_group: "domacisokovi",
+      android_group_message: { en: "New messages from Domaći Sokovi" },
+      existing_android_channel_id: "domacisokovi-channel",
       android_accent_color: "FF00FF00",
       // For iOS
       ios_badgeType: "Increase",
       ios_badgeCount: 1,
-      // Custom data to identify this as a Shhhhh Chat notification
+      // Custom data to identify this as a Domaći Sokovi notification
       data: {
         ...(data || {}),
-        appName: "Shhhhh Chat",
-        notificationSource: "shhhhh-chat",
+        appName: "Domaći Sokovi",
+        notificationSource: "domacisokovi",
       },
     }
 
