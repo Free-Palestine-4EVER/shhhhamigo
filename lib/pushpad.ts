@@ -1,8 +1,8 @@
 // Pushpad API utility functions
 import type { User } from "./types"
 
-const PUSHPAD_PROJECT_ID = 8920
-const PUSHPAD_AUTH_TOKEN = "cLieW18bqphPKqNURKKtrSGSNmyNZmacSKpiNTTE"
+const PUSHPAD_PROJECT_ID = 8920 // TODO: UPDATE with new Pushpad project ID
+const PUSHPAD_AUTH_TOKEN = "TODO_REPLACE_WITH_NEW_PUSHPAD_TOKEN"
 const PUSHPAD_API_URL = "https://pushpad.xyz/api/v1"
 
 // Function to send a notification via Pushpad API

@@ -4,7 +4,7 @@ import { ref, get } from "firebase/database"
 
 // OneSignal REST API endpoint
 const ONE_SIGNAL_API_URL = "https://onesignal.com/api/v1/notifications"
-const ONE_SIGNAL_APP_ID = "bf14367a-a8d6-4248-bd86-d074a56514af"
+const ONE_SIGNAL_APP_ID = "e6858309-3010-4b12-8641-792d690e8ee3"
 
 export async function POST(request: Request) {
   try {

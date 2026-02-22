@@ -16,7 +16,7 @@ export async function sendNotificationToUser(
         Authorization: `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
       },
       body: JSON.stringify({
-        app_id: "bf14367a-a8d6-4248-bd86-d074a56514af",
+        app_id: "e6858309-3010-4b12-8641-792d690e8ee3",
         include_external_user_ids: [userId],
         contents: { en: message },
         headings: { en: title },
@@ -44,7 +44,7 @@ export async function sendNotificationToAll(title: string, message: string, url 
         Authorization: `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
       },
       body: JSON.stringify({
-        app_id: "bf14367a-a8d6-4248-bd86-d074a56514af",
+        app_id: "e6858309-3010-4b12-8641-792d690e8ee3",
         included_segments: ["Subscribed Users"],
         contents: { en: message },
         headings: { en: title },

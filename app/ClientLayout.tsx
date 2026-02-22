@@ -27,7 +27,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         OneSignal.push(() => {
           window.OneSignal.init({
             appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "",
-            safari_web_id: "web.onesignal.auto.3c5e9739-5d23-4b67-8983-4f5de1f54a3c",
+            safari_web_id: "web.onesignal.auto.20f3ee95-6f21-4aad-a9bb-9c5899a4353a",
             notifyButton: {
               enable: false,
             },

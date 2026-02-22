@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     }
 
     const payload = {
-      app_id: "bf14367a-a8d6-4248-bd86-d074a56514af",
+      app_id: "e6858309-3010-4b12-8641-792d690e8ee3",
       headings: { en: title },
       contents: { en: message },
       url: url || "https://www.shhhhh.chat",

@@ -47,8 +47,8 @@ export default function OneSignalInitializer() {
 
       window.OneSignal.push(() => {
         window.OneSignal.init({
-          appId: "bf14367a-a8d6-4248-bd86-d074a56514af",
-          safari_web_id: "web.onesignal.auto.0c986762-3fda-40b6-9b49-8bb3a17e3d8e",
+          appId: "e6858309-3010-4b12-8641-792d690e8ee3",
+          safari_web_id: "web.onesignal.auto.20f3ee95-6f21-4aad-a9bb-9c5899a4353a",
           notifyButton: {
             enable: false,
           },
