@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import { useFirebase } from "@/components/firebase-provider"
 import { db } from "@/lib/firebase"
 import { ref, onValue, get, set, serverTimestamp, update } from "firebase/database"
@@ -782,7 +783,7 @@ export default function ChatLayout({ selectedServer, theme }: ChatLayoutProps) {
         </div>
       </div>
 
-      {isSettingsOpen && currentUser && (
+      {isSettingsOpen && currentUser && typeof document !== 'undefined' && createPortal(
         <SettingsModal
           user={currentUser}
           isOpen={isSettingsOpen}
@@ -803,7 +804,8 @@ export default function ChatLayout({ selectedServer, theme }: ChatLayoutProps) {
               })
             }
           }}
-        />
+        />,
+        document.body
       )}
 
     </div>

@@ -1110,21 +1110,7 @@
   font-size: 1.1rem;
 }
 
-/* Scan-line effect - purely decorative, NO interaction blocking */
-.secret-chat-overlay::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none !important;
-  z-index: 10002;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 212, 170, 0.008) 2px,
-    rgba(0, 212, 170, 0.008) 4px
-  );
-}
+/* Scan-line removed — was blocking clicks on some browsers */
 
 /* Ensure ALL interactive elements inside secret chat are clickable */
 .secret-chat-overlay button,

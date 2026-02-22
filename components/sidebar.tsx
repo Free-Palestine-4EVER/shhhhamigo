@@ -324,6 +324,7 @@ export default function Sidebar({
                 >
                   <div
                     style={{
+                      position: "relative",
                       width: "100%",
                       height: "100%",
                       borderRadius: "50%",
@@ -335,6 +336,7 @@ export default function Sidebar({
                       src={currentUser.photoURL || "/placeholder.svg"}
                       alt={currentUser.username}
                       fill
+                      sizes="44px"
                       style={{ objectFit: "cover" }}
                     />
                   </div>
