@@ -196,7 +196,7 @@ function AppContent() {
                   console.log("Subscription has expired, showing payment modal")
                   setSubscriptionExpired(true)
                   // Show payment modal if subscription has expired
-                  setShowPaymentModal(true)
+                  // TEMPORARILY DISABLED: setShowPaymentModal(true)
                 } else {
                   // Set up a check to show payment modal when subscription expires
                   const timeUntilExpiry = expiryDate.getTime() - now.getTime()
@@ -205,7 +205,7 @@ function AppContent() {
                   if (timeUntilExpiry <= 24 * 60 * 60 * 1000) {
                     setTimeout(() => {
                       setSubscriptionExpired(true)
-                      setShowPaymentModal(true)
+                      // TEMPORARILY DISABLED: setShowPaymentModal(true)
                     }, timeUntilExpiry)
                   }
                 }
@@ -252,7 +252,7 @@ function AppContent() {
             if (expiryDate <= now && !subscriptionExpired) {
               console.log("Subscription has expired during session, showing payment modal")
               setSubscriptionExpired(true)
-              setShowPaymentModal(true)
+              // TEMPORARILY DISABLED: setShowPaymentModal(true)
             }
           }
         }
@@ -354,13 +354,13 @@ function AppContent() {
 
         // Show payment modal if status is not verified
         if (data.status !== "verified" && isConnected) {
-          setShowPaymentModal(true)
+          // TEMPORARILY DISABLED: setShowPaymentModal(true)
         }
       } else {
         setPaymentStatus(null)
         // Show payment modal for users with no payment data once they're connected
         if (isConnected) {
-          setShowPaymentModal(true)
+          // TEMPORARILY DISABLED: setShowPaymentModal(true)
         }
       }
     })
@@ -373,7 +373,7 @@ function AppContent() {
 
         // If payment is rejected or pending, show payment modal
         if (data.status !== "verified" && isConnected) {
-          setShowPaymentModal(true)
+          // TEMPORARILY DISABLED: setShowPaymentModal(true)
         } else if (data.status === "verified") {
           // Hide modal when payment is verified
           setShowPaymentModal(false)
@@ -384,7 +384,7 @@ function AppContent() {
         setPaymentStatus(null)
         // Show payment modal for users with no payment data
         if (isConnected) {
-          setShowPaymentModal(true)
+          // TEMPORARILY DISABLED: setShowPaymentModal(true)
         }
       }
     })
@@ -399,7 +399,7 @@ function AppContent() {
 
     // Show payment modal after server selection if no active subscription
     if ((paymentChecked && (!paymentStatus || paymentStatus !== "verified")) || subscriptionExpired) {
-      setShowPaymentModal(true)
+      // TEMPORARILY DISABLED: setShowPaymentModal(true)
     }
   }
 
