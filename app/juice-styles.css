@@ -2,6 +2,7 @@
 /* Organic, warm, earthy theme */
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 .juice-site {
   font-family: 'Inter', system-ui, sans-serif;
@@ -555,8 +556,54 @@
   font-size: 0.85rem;
 }
 
+.juice-card-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.juice-qty-picker {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid #e8e0cc;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.juice-qty-btn {
+  width: 36px;
+  height: 38px;
+  background: #fefcf3;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d2a24;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.juice-qty-btn:hover {
+  background: #f0ebe0;
+}
+
+.juice-qty-value {
+  width: 32px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #2d2a24;
+  border-left: 1px solid #e8e0cc;
+  border-right: 1px solid #e8e0cc;
+  line-height: 38px;
+}
+
 .juice-add-btn {
-  width: 100%;
+  flex: 1;
   background: linear-gradient(135deg, #e85d26, #f0803e);
   color: white;
   border: none;
@@ -571,6 +618,17 @@
 .juice-add-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(232, 93, 38, 0.3);
+}
+
+.juice-card-in-cart {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #2d6a2e;
+  font-weight: 600;
+  background: rgba(45, 106, 46, 0.08);
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
 }
 
 /* ===== TESTIMONIAL ===== */
@@ -1040,8 +1098,465 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: #0a0a0f;
-  color: #a0a0b0;
-  font-family: 'Inter', sans-serif;
+  background: #0d1117;
+  color: #00d4aa;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 1.1rem;
+}
+
+/* ============================================= */
+/* SECRET CHAT CYBERPUNK THEME OVERRIDES         */
+/* Complete restyle of all chat components        */
+/* ============================================= */
+
+.secret-chat-overlay {
+  font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+  background: #0d1117 !important;
+}
+
+.secret-chat-close {
+  background: rgba(0, 212, 170, 0.1) !important;
+  border: 1px solid rgba(0, 212, 170, 0.3) !important;
+  color: #00d4aa !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1.2rem !important;
+  backdrop-filter: blur(20px) !important;
+  transition: all 0.3s ease !important;
+  z-index: 10001 !important;
+}
+
+.secret-chat-close:hover {
+  background: rgba(0, 212, 170, 0.2) !important;
+  border-color: #00d4aa !important;
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.2) !important;
+}
+
+/* ===== AUTH SCREEN OVERRIDES ===== */
+/* Override all inline styles in auth-screen.tsx */
+
+.secret-chat-overlay .secret-chat-auth > div {
+  background: #0d1117 !important;
+}
+
+.secret-chat-overlay .secret-chat-auth div[style*="backgroundColor: \"#000\""],
+.secret-chat-overlay .secret-chat-auth div[style*="background-color"],
+.secret-chat-overlay .secret-chat-auth > div > div {
+  background: #0d1117 !important;
+}
+
+/* Target the auth container - override black bg */
+.secret-chat-overlay div[style*="min-height: 100vh"],
+.secret-chat-overlay div[style*="minHeight"] {
+  background: #0d1117 !important;
+}
+
+/* Card style override */
+.secret-chat-overlay div[style*="max-width: 28rem"],
+.secret-chat-overlay div[style*="maxWidth: \"28rem\""],
+.secret-chat-overlay div[style*="maxWidth"] {
+  background: rgba(13, 17, 23, 0.95) !important;
+  border: 1px solid rgba(0, 212, 170, 0.15) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 60px rgba(0, 212, 170, 0.05), 0 20px 60px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* All headings in secret chat */
+.secret-chat-overlay h1,
+.secret-chat-overlay h2,
+.secret-chat-overlay h3,
+.secret-chat-overlay h4 {
+  font-family: 'Space Grotesk', sans-serif !important;
+  color: #e6edf3 !important;
+}
+
+/* The "Welcome to Shhhhh" heading */
+.secret-chat-overlay h1 span,
+.secret-chat-overlay div[style*="color: \"#ec4899\""],
+.secret-chat-overlay span[style*="color: \"#ec4899\""],
+.secret-chat-overlay *[style*="color: rgb(236, 72, 153)"] {
+  color: #00d4aa !important;
+}
+
+/* Override ALL pink/ec4899 colors to cyan/teal */
+.secret-chat-overlay *[style*="#ec4899"],
+.secret-chat-overlay *[style*="rgb(236, 72, 153)"] {
+  color: #00d4aa !important;
+}
+
+.secret-chat-overlay button[style*="#ec4899"],
+.secret-chat-overlay button[style*="rgb(236, 72, 153)"] {
+  background: linear-gradient(135deg, #00d4aa, #00b4d8) !important;
+  color: #0d1117 !important;
+  border: none !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.secret-chat-overlay button[style*="#ec4899"]:hover,
+.secret-chat-overlay button[style*="rgb(236, 72, 153)"]:hover {
+  box-shadow: 0 0 30px rgba(0, 212, 170, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Form inputs */
+.secret-chat-overlay input[type="email"],
+.secret-chat-overlay input[type="password"],
+.secret-chat-overlay input[type="text"],
+.secret-chat-overlay input[style*="backgroundColor"],
+.secret-chat-overlay textarea {
+  background: rgba(22, 27, 34, 0.8) !important;
+  border: 1px solid rgba(0, 212, 170, 0.2) !important;
+  border-radius: 8px !important;
+  color: #e6edf3 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  transition: border-color 0.3s, box-shadow 0.3s !important;
+}
+
+.secret-chat-overlay input:focus,
+.secret-chat-overlay textarea:focus {
+  border-color: #00d4aa !important;
+  box-shadow: 0 0 15px rgba(0, 212, 170, 0.15) !important;
+  outline: none !important;
+}
+
+.secret-chat-overlay input::placeholder {
+  color: #484f58 !important;
+}
+
+/* Links */
+.secret-chat-overlay button[style*="textDecoration: \"underline\""],
+.secret-chat-overlay button[style*="color: \"#ec4899\""] {
+  color: #00d4aa !important;
+}
+
+/* Footer / "Encrypted" text */
+.secret-chat-overlay div[style*="borderTop: \"1px solid #27272a\""],
+.secret-chat-overlay div[style*="border-top"] {
+  border-top-color: rgba(0, 212, 170, 0.15) !important;
+}
+
+.secret-chat-overlay div[style*="borderTop"] span,
+.secret-chat-overlay div[style*="border-top"] span {
+  color: #484f58 !important;
+}
+
+/* Quote text at top */
+.secret-chat-overlay p[style*="color: \"#32CD32\""],
+.secret-chat-overlay p[style*="color: rgb(50, 205, 50)"] {
+  color: rgba(0, 212, 170, 0.4) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* Error alerts */
+.secret-chat-overlay div[style*="background-color: rgba(127, 29, 29"],
+.secret-chat-overlay div[style*="backgroundColor: \"rgba(127, 29, 29"] {
+  background: rgba(248, 81, 73, 0.1) !important;
+  border-color: rgba(248, 81, 73, 0.3) !important;
+  color: #f85149 !important;
+  border-radius: 8px !important;
+}
+
+/* ===== CHAT LAYOUT OVERRIDES ===== */
+
+/* Main chat container */
+.secret-chat-overlay .secret-chat-container > div,
+.secret-chat-overlay div[style*="background: \"#000000\""],
+.secret-chat-overlay div[style*="background: rgb(0, 0, 0)"] {
+  background: #0d1117 !important;
+}
+
+/* ===== SIDEBAR OVERRIDES ===== */
+
+/* Sidebar container - the dark bg */
+.secret-chat-overlay div[style*="background: \"#000000\""] > div > div:first-child,
+.secret-chat-overlay div[style*="width: \"320px\""],
+.secret-chat-overlay div[style*="width: \"100%\""] > div[style*="background"] {
+  background: #0d1117 !important;
+  border-right: 1px solid rgba(0, 212, 170, 0.1) !important;
+}
+
+/* Sidebar search inputs */
+.secret-chat-overlay div[style*="background: \"rgba(15, 23, 42"] input,
+.secret-chat-overlay div[style*="background: rgba(15, 23, 42"] input {
+  background: rgba(22, 27, 34, 0.8) !important;
+  border: 1px solid rgba(0, 212, 170, 0.15) !important;
+  color: #e6edf3 !important;
+}
+
+/* Chat list items */
+.secret-chat-overlay div[style*="background: \"rgba(30, 41, 59"],
+.secret-chat-overlay div[style*="background: rgba(30, 41, 59"] {
+  background: rgba(0, 212, 170, 0.05) !important;
+  border-left: 2px solid #00d4aa !important;
+}
+
+/* Online status dots - override green gradient */
+.secret-chat-overlay div[style*="background: \"linear-gradient(to right, rgb(74, 222, 128"],
+.secret-chat-overlay div[style*="background: linear-gradient(to right, rgb(74, 222, 128"] {
+  background: #00d4aa !important;
+  box-shadow: 0 0 8px rgba(0, 212, 170, 0.5) !important;
+}
+
+/* Blue gradient elements → cyan */
+.secret-chat-overlay div[style*="background: \"linear-gradient(to right, rgb(59, 130, 246"],
+.secret-chat-overlay div[style*="background: linear-gradient(to right, rgb(59, 130, 246"] {
+  background: linear-gradient(135deg, #00d4aa, #00b4d8) !important;
+}
+
+/* Avatar fallbacks */
+.secret-chat-overlay div[style*="background: \"rgb(30, 41, 59)\""],
+.secret-chat-overlay div[style*="background: rgb(30, 41, 59)"] {
+  background: rgba(0, 212, 170, 0.15) !important;
+  border: 1px solid rgba(0, 212, 170, 0.2) !important;
+}
+
+/* Text colors in sidebar */
+.secret-chat-overlay div[style*="color: \"#e2e8f0\""],
+.secret-chat-overlay span[style*="color: \"#e2e8f0\""],
+.secret-chat-overlay p[style*="color: \"#e2e8f0\""] {
+  color: #e6edf3 !important;
+}
+
+.secret-chat-overlay div[style*="color: \"#94a3b8\""],
+.secret-chat-overlay span[style*="color: \"#94a3b8\""],
+.secret-chat-overlay p[style*="color: \"#94a3b8\""] {
+  color: #484f58 !important;
+}
+
+.secret-chat-overlay div[style*="color: \"#9ca3af\""],
+.secret-chat-overlay span[style*="color: \"#9ca3af\""],
+.secret-chat-overlay p[style*="color: \"#9ca3af\""] {
+  color: #484f58 !important;
+}
+
+.secret-chat-overlay span[style*="color: \"#64748b\""],
+.secret-chat-overlay p[style*="color: \"#64748b\""] {
+  color: #30363d !important;
+}
+
+/* Tab buttons in sidebar */
+.secret-chat-overlay button[style*="borderBottom"] {
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* Orange gradient elements → teal */
+.secret-chat-overlay div[style*="background: \"linear-gradient(to right, rgb(251, 191, 36"],
+.secret-chat-overlay div[style*="background: linear-gradient(to right, rgb(251, 191, 36"] {
+  background: linear-gradient(135deg, #00b4d8, #0077b6) !important;
+}
+
+/* Gray gradient elements */
+.secret-chat-overlay div[style*="background: \"linear-gradient(to right, rgb(51, 65, 85"],
+.secret-chat-overlay div[style*="background: linear-gradient(to right, rgb(51, 65, 85"] {
+  background: linear-gradient(135deg, #161b22, #21262d) !important;
+  border: 1px solid rgba(0, 212, 170, 0.1) !important;
+}
+
+/* ===== CHAT WINDOW OVERRIDES ===== */
+
+/* Chat window header */
+.secret-chat-overlay div[style*="borderBottom: \"1px solid"],
+.secret-chat-overlay div[style*="border-bottom: 1px solid"] {
+  border-bottom-color: rgba(0, 212, 170, 0.1) !important;
+  background: rgba(13, 17, 23, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Message bubbles - sent */
+.secret-chat-overlay div[style*="background: \"linear-gradient"],
+.secret-chat-overlay div[style*="background: linear-gradient(135deg, rgb(37, 99, 235"],
+.secret-chat-overlay div[style*="background: \"linear-gradient(135deg, #2563eb"] {
+  background: linear-gradient(135deg, #003d33, #00574a) !important;
+  border: 1px solid rgba(0, 212, 170, 0.2) !important;
+  border-radius: 16px 16px 4px 16px !important;
+}
+
+/* Message bubbles - received */
+.secret-chat-overlay div[style*="background: \"#1e293b\""],
+.secret-chat-overlay div[style*="background: \"rgba(30, 41, 59, 0.8)\""],
+.secret-chat-overlay div[style*="background: rgba(30, 41, 59"] {
+  background: #161b22 !important;
+  border: 1px solid rgba(48, 54, 61, 0.5) !important;
+  border-radius: 16px 16px 16px 4px !important;
+}
+
+/* Message text */
+.secret-chat-overlay div[style*="background"] p[style*="color: \"#fff\""],
+.secret-chat-overlay div[style*="background"] p[style*="color: white"],
+.secret-chat-overlay div[style*="background"] span[style*="color: \"#fff\""],
+.secret-chat-overlay div[style*="background"] p {
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* Message input area */
+.secret-chat-overlay div[style*="background: \"#0a0a0f\""],
+.secret-chat-overlay div[style*="background: \"#000\""],
+.secret-chat-overlay div[style*="background: \"#111\""],
+.secret-chat-overlay div[style*="backgroundColor: \"#000\""] {
+  background: #0d1117 !important;
+}
+
+/* Text input boxes in chat */
+.secret-chat-overlay textarea[style],
+.secret-chat-overlay div[contenteditable] {
+  background: #161b22 !important;
+  border: 1px solid rgba(0, 212, 170, 0.15) !important;
+  color: #e6edf3 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  border-radius: 12px !important;
+}
+
+/* Send button */
+.secret-chat-overlay button[style*="background: \"#2563eb\""],
+.secret-chat-overlay button[style*="background: rgb(37, 99, 235)"],
+.secret-chat-overlay button[style*="backgroundColor: \"#2563eb\""] {
+  background: linear-gradient(135deg, #00d4aa, #00b4d8) !important;
+  color: #0d1117 !important;
+  border-radius: 10px !important;
+  border: none !important;
+}
+
+/* Spinner overrides */
+.secret-chat-overlay div[style*="border-top-color: \"#ec4899\""],
+.secret-chat-overlay div[style*="borderTopColor: \"#ec4899\""],
+.secret-chat-overlay div[style*="borderTopColor"] {
+  border-top-color: #00d4aa !important;
+  border-bottom-color: #00d4aa !important;
+}
+
+/* ===== PASSCODE SCREEN OVERRIDES ===== */
+
+.secret-chat-overlay div[style*="background: \"radial-gradient"],
+.secret-chat-overlay div[style*="background: radial-gradient"] {
+  background: radial-gradient(ellipse at center, #0d1117 0%, #010409 100%) !important;
+}
+
+/* Passcode dots */
+.secret-chat-overlay div[style*="background: \"#ec4899\""],
+.secret-chat-overlay div[style*="background: rgb(236, 72, 153)"],
+.secret-chat-overlay div[style*="backgroundColor: \"#ec4899\""] {
+  background: #00d4aa !important;
+  box-shadow: 0 0 12px rgba(0, 212, 170, 0.5) !important;
+}
+
+.secret-chat-overlay div[style*="background: \"#3f3f46\""],
+.secret-chat-overlay div[style*="background: rgb(63, 63, 70)"] {
+  background: #21262d !important;
+  border: 1px solid rgba(0, 212, 170, 0.2) !important;
+}
+
+/* Number pad buttons */
+.secret-chat-overlay div[style*="background: \"rgba(39, 39, 42"],
+.secret-chat-overlay button[style*="background: \"rgba(39, 39, 42"],
+.secret-chat-overlay div[style*="backgroundColor: \"rgba(39, 39, 42"] {
+  background: rgba(22, 27, 34, 0.8) !important;
+  border: 1px solid rgba(0, 212, 170, 0.1) !important;
+  color: #e6edf3 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* ===== SERVER SELECTION MODAL ===== */
+
+.secret-chat-overlay div[style*="background: \"rgba(0, 0, 0, 0.8)\""],
+.secret-chat-overlay div[style*="background: rgba(0, 0, 0, 0.8)"] {
+  background: rgba(1, 4, 9, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.secret-chat-overlay div[style*="background: \"#1a1a2e\""],
+.secret-chat-overlay div[style*="background: \"rgba(30, 30, 46"],
+.secret-chat-overlay div[style*="background: \"#16213e\""] {
+  background: #0d1117 !important;
+  border: 1px solid rgba(0, 212, 170, 0.15) !important;
+}
+
+/* Settings modal */
+.secret-chat-overlay div[role="dialog"],
+.secret-chat-overlay [class*="DialogContent"] {
+  background: #0d1117 !important;
+  border: 1px solid rgba(0, 212, 170, 0.15) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* ===== GLOBAL SECRET CHAT TYPOGRAPHY ===== */
+
+.secret-chat-overlay p,
+.secret-chat-overlay span,
+.secret-chat-overlay div,
+.secret-chat-overlay button,
+.secret-chat-overlay input,
+.secret-chat-overlay textarea,
+.secret-chat-overlay label,
+.secret-chat-overlay a {
+  font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+}
+
+/* Monospace elements */
+.secret-chat-overlay code,
+.secret-chat-overlay pre,
+.secret-chat-overlay .timestamp {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* All white text stays readable */
+.secret-chat-overlay *[style*="color: \"#fff\""],
+.secret-chat-overlay *[style*="color: white"],
+.secret-chat-overlay *[style*="color: rgb(255, 255, 255)"] {
+  color: #e6edf3 !important;
+}
+
+/* Scrollbar styling for the secret chat */
+.secret-chat-overlay ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.secret-chat-overlay ::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+.secret-chat-overlay ::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 170, 0.2);
+  border-radius: 3px;
+}
+
+.secret-chat-overlay ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 170, 0.4);
+}
+
+/* Glow effect for interactive elements */
+.secret-chat-overlay button:active {
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.2) !important;
+}
+
+/* Override any remaining pink/purple accents to teal/cyan */
+.secret-chat-overlay *[style*="rgb(168, 85, 247)"] {
+  color: #00b4d8 !important;
+}
+
+.secret-chat-overlay *[style*="#a855f7"],
+.secret-chat-overlay *[style*="rgb(168, 85, 247)"] {
+  color: #00b4d8 !important;
+}
+
+/* Subtle scan-line effect on the overlay */
+.secret-chat-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10002;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 212, 170, 0.01) 2px,
+    rgba(0, 212, 170, 0.01) 4px
+  );
 }
