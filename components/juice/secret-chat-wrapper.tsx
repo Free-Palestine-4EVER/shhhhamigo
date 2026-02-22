@@ -73,7 +73,6 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
   if (user && showPasscode) {
     return (
       <div className="secret-chat-overlay">
-        <button className="secret-chat-close" onClick={onClose}>✕ Zatvori</button>
         <PasscodeScreen userId={user.uid} onVerified={() => { setShowPasscode(false); setPasscodeVerified(true); updateLastAccessTime() }} />
       </div>
     )
@@ -82,7 +81,6 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
   if (user && showPasscodeSetup) {
     return (
       <div className="secret-chat-overlay">
-        <button className="secret-chat-close" onClick={onClose}>✕ Zatvori</button>
         <PasscodeSetup userId={user.uid} onComplete={() => { setShowPasscodeSetup(false); setPasscodeVerified(true); updateLastAccessTime() }} />
       </div>
     )
@@ -90,7 +88,6 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="secret-chat-overlay">
-      <button className="secret-chat-close" onClick={onClose}>✕ Zatvori</button>
       <div className="secret-chat-container">
         {!user ? (
           <div className="secret-chat-auth">
