@@ -17,9 +17,10 @@ import { hasEncryptionKeys } from "@/lib/encryption"
 
 interface ChatLayoutProps {
   selectedServer?: string | null
+  theme?: string
 }
 
-export default function ChatLayout({ selectedServer }: ChatLayoutProps) {
+export default function ChatLayout({ selectedServer, theme }: ChatLayoutProps) {
   const { user, firebaseInitialized } = useFirebase()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [chats, setChats] = useState<Chat[]>([])
@@ -723,6 +724,7 @@ export default function ChatLayout({ selectedServer }: ChatLayoutProps) {
         height: "100vh",
         background: "#000000",
       }}
+      className={`chat-layout ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
     >
       {/* Include the OnlinePresence component but it doesn't render anything visible */}
       {currentUser && <OnlinePresence userId={currentUser.id} />}
@@ -753,6 +755,7 @@ export default function ChatLayout({ selectedServer }: ChatLayoutProps) {
               filteredUsers={filteredUsers}
               selectedServer={selectedServer}
               isMobileView={isMobileView}
+              theme={theme}
             />
           </div>
 
@@ -773,6 +776,7 @@ export default function ChatLayout({ selectedServer }: ChatLayoutProps) {
               isMobileView={isMobileView}
               onBackClick={handleBackToSidebar}
               isGroup={isGroup}
+              theme={theme}
             />
           </div>
         </div>

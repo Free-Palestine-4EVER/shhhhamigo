@@ -33,7 +33,7 @@ export default function AddToHomescreen() {
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-md mx-auto text-white">
-        <h2 className="text-2xl font-bold mb-6 text-center">Install Calculator to Home Screen</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Dodaj Domaći Sokovi na početni zaslon</h2>
 
         <div className="space-y-8">
           <ol className="list-decimal pl-5 space-y-8">

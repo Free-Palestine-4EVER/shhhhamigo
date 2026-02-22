@@ -36,6 +36,7 @@ interface ChatWindowProps {
   isMobileView?: boolean
   onBackClick?: () => void
   isGroup?: boolean
+  theme?: string
 }
 
 // Add this function after the imports and before the ChatWindow component
@@ -189,6 +190,7 @@ export default function ChatWindow({
   isMobileView = false,
   onBackClick,
   isGroup = false,
+  theme,
 }: ChatWindowProps) {
   // Add a state variable for tracking online status at the top of the component with other state variables
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({})
@@ -1436,7 +1438,7 @@ export default function ChatWindow({
           backdropFilter: "blur(24px)",
           position: "relative",
         }}
-        className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative"
+        className={`flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative chat-window ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
       >
         {/* Floating Elements */}
         <div className="absolute top-10 left-10 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30 animate-pulse"></div>
@@ -1492,7 +1494,7 @@ export default function ChatWindow({
         backdropFilter: "blur(24px)",
         position: "relative",
       }}
-      className="flex-1 flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative"
+      className={`flex-1 flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative chat-window ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
     >
       {/* Floating Elements */}
       <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40 animate-ping"></div>

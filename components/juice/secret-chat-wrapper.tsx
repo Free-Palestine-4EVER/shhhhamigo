@@ -73,7 +73,7 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
   if (user && showPasscode) {
     return (
       <div className="secret-chat-overlay">
-        <PasscodeScreen userId={user.uid} onVerified={() => { setShowPasscode(false); setPasscodeVerified(true); updateLastAccessTime() }} />
+        <PasscodeScreen userId={user.uid} onVerified={() => { setShowPasscode(false); setPasscodeVerified(true); updateLastAccessTime() }} theme="cyberpunk" />
       </div>
     )
   }
@@ -81,7 +81,7 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
   if (user && showPasscodeSetup) {
     return (
       <div className="secret-chat-overlay">
-        <PasscodeSetup userId={user.uid} onComplete={() => { setShowPasscodeSetup(false); setPasscodeVerified(true); updateLastAccessTime() }} />
+        <PasscodeSetup userId={user.uid} onComplete={() => { setShowPasscodeSetup(false); setPasscodeVerified(true); updateLastAccessTime() }} theme="cyberpunk" />
       </div>
     )
   }
@@ -91,11 +91,11 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
       <div className="secret-chat-container">
         {!user ? (
           <div className="secret-chat-auth">
-            <AuthScreen />
+            <AuthScreen theme="cyberpunk" />
           </div>
         ) : (
           <>
-            <ChatLayout selectedServer={selectedServer} />
+            <ChatLayout selectedServer={selectedServer} theme="cyberpunk" />
             <ServerSelectionModal isOpen={showServerSelection} onServerSelect={(id: string) => { setSelectedServer(id); setShowServerSelection(false) }} />
             <OneSignalInitializer />
             <OneSignalModalManager />

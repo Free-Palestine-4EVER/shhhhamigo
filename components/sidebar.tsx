@@ -27,6 +27,7 @@ interface SidebarProps {
   filteredUsers: User[]
   selectedServer?: string | null
   isMobileView?: boolean // Added for responsive design
+  theme?: string
 }
 
 // Map server IDs to readable names
@@ -54,6 +55,7 @@ export default function Sidebar({
   filteredUsers,
   selectedServer,
   isMobileView = false,
+  theme,
 }: SidebarProps) {
   const [isSearching, setIsSearching] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({})
@@ -285,6 +287,7 @@ export default function Sidebar({
         borderRight: "1px solid rgba(255, 255, 255, 0.1)",
         overflow: "hidden",
       }}
+      className={`sidebar ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
     >
       {/* Floating Elements */}
       <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-60 animate-ping"></div>

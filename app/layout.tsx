@@ -13,7 +13,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Calculator",
+    title: "Domaći Sokovi",
   },
   viewport: {
     width: "device-width",
@@ -503,7 +503,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Calculator" />
+        <meta name="apple-mobile-web-app-title" content="Domaći Sokovi" />
         <meta name="theme-color" content="#000000" />
 
         {/* OneSignal Web Push Notifications Setup */}

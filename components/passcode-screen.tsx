@@ -26,9 +26,11 @@ import {
 interface PasscodeScreenProps {
   userId: string
   onVerified: () => void
+  theme?: string
 }
 
-export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenProps) {
+export default function PasscodeScreen({ userId, onVerified, theme }: PasscodeScreenProps) {
+  const isCyberpunk = theme === "cyberpunk"
   const [passcode, setPasscode] = useState<string[]>([])
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(true)
@@ -506,10 +508,10 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} className={`passcode-screen ${isCyberpunk ? 'cyberpunk-theme' : ''}`}>
       <MatrixBackground />
 
-      <div style={contentStyle}>
+      <div style={contentStyle} className="passcode-content">
         <div className="text-center mb-12">
           <div className="relative inline-block mb-6">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
@@ -544,9 +546,9 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
           </div>
         )}
 
-        <div style={{ ...dotsContainerStyle, gap: '1rem' }}>
+        <div style={{ ...dotsContainerStyle, gap: '1rem' }} className="passcode-dots">
           {[0, 1, 2, 3, 4, 5].map((index) => (
-            <div key={index} style={{ ...dotStyle(passcode.length > index), width: '14px', height: '14px' }}></div>
+            <div key={index} style={{ ...dotStyle(passcode.length > index), width: '14px', height: '14px' }} className={`passcode-dot ${passcode.length > index ? 'passcode-dot-filled' : ''}`}></div>
           ))}
           <button
             onClick={() => setShowDots(!showDots)}
@@ -567,7 +569,7 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
           </button>
         </div>
 
-        <div style={numberPadStyle}>
+        <div style={numberPadStyle} className="passcode-numpad">
           <div style={gridStyle}>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((number) => (
               <button
@@ -575,6 +577,7 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
                 onClick={() => handleNumberPress(number)}
                 disabled={isVerifying || attempts >= maxAttempts}
                 style={numberButtonStyle}
+                className="passcode-num-btn"
               >
                 {number}
               </button>
@@ -584,6 +587,7 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
               onClick={() => handleNumberPress(0)}
               disabled={isVerifying || attempts >= maxAttempts}
               style={numberButtonStyle}
+              className="passcode-num-btn"
             >
               0
             </button>
@@ -591,6 +595,7 @@ export default function PasscodeScreen({ userId, onVerified }: PasscodeScreenPro
               onClick={handleDelete}
               disabled={passcode.length === 0 || isVerifying || attempts >= maxAttempts}
               style={deleteButtonStyle}
+              className="passcode-delete-btn"
             >
               ⌫
             </button>

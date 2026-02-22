@@ -12,7 +12,12 @@ import { generateKeyPair, storePrivateKey, getPrivateKey, hasEncryptionKeys } fr
 // Generate or get deviceId
 
 
-export default function AuthScreen() {
+interface AuthScreenProps {
+  theme?: string
+}
+
+export default function AuthScreen({ theme }: AuthScreenProps = {}) {
+  const isCyberpunk = theme === "cyberpunk"
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [isOnline, setIsOnline] = useState(true)
@@ -344,20 +349,20 @@ export default function AuthScreen() {
 
   return (
     <>
-      <div style={quoteStyle}>
-        <p style={quoteTextStyle}>I have joined the war on drugs, but on the drugs side</p>
+      <div style={quoteStyle} className="auth-quote">
+        <p style={quoteTextStyle} className="auth-quote-text">I have joined the war on drugs, but on the drugs side</p>
       </div>
 
-      <div style={containerStyle}>
-        <div style={cardStyle}>
+      <div style={containerStyle} className={`auth-container ${isCyberpunk ? 'cyberpunk-theme' : ''}`}>
+        <div style={cardStyle} className="auth-card">
           <div style={titleStyle}>
-            <h1 style={headingStyle}>
-              Welcome to <span style={primaryTextStyle}>Shhhhh</span>
+            <h1 style={headingStyle} className="auth-heading">
+              Welcome to <span style={primaryTextStyle} className="auth-accent">Shhhhh</span>
             </h1>
           </div>
 
           {!isOnline && (
-            <div style={alertStyle}>
+            <div style={alertStyle} className="auth-alert">
               <AlertCircle style={{ width: "16px", height: "16px", flexShrink: 0 }} />
               <div>
                 <strong>You are offline</strong>
@@ -367,14 +372,14 @@ export default function AuthScreen() {
           )}
 
           {error && (
-            <div style={alertStyle}>
+            <div style={alertStyle} className="auth-alert">
               <AlertCircle style={{ width: "16px", height: "16px", flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
 
           {isRegisterMode ? (
-            <form onSubmit={handleRegister} style={formStyle}>
+            <form onSubmit={handleRegister} style={formStyle} className="auth-form">
               <input
                 type="text"
                 placeholder="Username"
@@ -382,6 +387,7 @@ export default function AuthScreen() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 style={inputStyle}
+                className="auth-input"
               />
               <input
                 type="email"
@@ -390,6 +396,7 @@ export default function AuthScreen() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 style={inputStyle}
+                className="auth-input"
               />
               <input
                 type="password"
@@ -398,8 +405,9 @@ export default function AuthScreen() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={inputStyle}
+                className="auth-input"
               />
-              <button type="submit" disabled={isLoading || !isOnline} style={buttonStyle}>
+              <button type="submit" disabled={isLoading || !isOnline} style={buttonStyle} className="auth-button">
                 {isLoading ? (
                   <>
                     <RefreshCw style={{ width: "16px", height: "16px", animation: "spin 1s linear infinite" }} />
@@ -409,17 +417,17 @@ export default function AuthScreen() {
                   "Register"
                 )}
               </button>
-              <div style={linkContainerStyle}>
+              <div style={linkContainerStyle} className="auth-link-container">
                 <p>
                   Already have an account?{" "}
-                  <button type="button" onClick={() => setIsRegisterMode(false)} style={linkStyle}>
+                  <button type="button" onClick={() => setIsRegisterMode(false)} style={linkStyle} className="auth-link">
                     Login now
                   </button>
                 </p>
               </div>
             </form>
           ) : (
-            <form onSubmit={handleLogin} style={formStyle}>
+            <form onSubmit={handleLogin} style={formStyle} className="auth-form">
               <input
                 type="email"
                 placeholder="Email"
@@ -427,6 +435,7 @@ export default function AuthScreen() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 style={inputStyle}
+                className="auth-input"
               />
               <input
                 type="password"
@@ -435,8 +444,9 @@ export default function AuthScreen() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={inputStyle}
+                className="auth-input"
               />
-              <button type="submit" disabled={isLoading || !isOnline} style={buttonStyle}>
+              <button type="submit" disabled={isLoading || !isOnline} style={buttonStyle} className="auth-button">
                 {isLoading ? (
                   <>
                     <RefreshCw style={{ width: "16px", height: "16px", animation: "spin 1s linear infinite" }} />
@@ -446,10 +456,10 @@ export default function AuthScreen() {
                   "Login"
                 )}
               </button>
-              <div style={linkContainerStyle}>
+              <div style={linkContainerStyle} className="auth-link-container">
                 <p>
                   Don't have an account?{" "}
-                  <button type="button" onClick={() => setIsRegisterMode(true)} style={linkStyle}>
+                  <button type="button" onClick={() => setIsRegisterMode(true)} style={linkStyle} className="auth-link">
                     Register now
                   </button>
                 </p>
@@ -457,8 +467,8 @@ export default function AuthScreen() {
             </form>
           )}
 
-          <div style={footerStyle}>
-            <Shield style={{ width: "16px", height: "16px", color: "#ec4899", marginRight: "0.5rem" }} />
+          <div style={footerStyle} className="auth-footer">
+            <Shield style={{ width: "16px", height: "16px", color: "#ec4899", marginRight: "0.5rem" }} className="auth-footer-icon" />
             <span>Encrypted & Anonymous Secure Chat</span>
           </div>
         </div>

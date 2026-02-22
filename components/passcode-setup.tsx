@@ -13,9 +13,11 @@ import { ScanFace } from "lucide-react"
 interface PasscodeSetupProps {
   userId: string
   onComplete: () => void
+  theme?: string
 }
 
-export default function PasscodeSetup({ userId, onComplete }: PasscodeSetupProps) {
+export default function PasscodeSetup({ userId, onComplete, theme }: PasscodeSetupProps) {
+  const isCyberpunk = theme === "cyberpunk"
   const [step, setStep] = useState<"create" | "confirm" | "biometric">("create")
   const [passcode, setPasscode] = useState<string[]>([])
   const [confirmPasscode, setConfirmPasscode] = useState<string[]>([])
@@ -173,7 +175,7 @@ export default function PasscodeSetup({ userId, onComplete }: PasscodeSetupProps
   const currentArray = step === "create" ? passcode : confirmPasscode
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden">
+    <div className={`relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 overflow-hidden passcode-setup ${isCyberpunk ? 'cyberpunk-theme' : ''}`}>
       <MatrixBackground />
 
       {/* Floating security elements */}
