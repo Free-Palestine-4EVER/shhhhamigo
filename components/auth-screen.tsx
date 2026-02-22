@@ -350,14 +350,14 @@ export default function AuthScreen({ theme }: AuthScreenProps = {}) {
   return (
     <>
       <div style={quoteStyle} className="auth-quote">
-        <p style={quoteTextStyle} className="auth-quote-text">I have joined the war on drugs, but on the drugs side</p>
+        <p style={quoteTextStyle} className="auth-quote-text">Priroda u svakom gutljaju 🍊</p>
       </div>
 
       <div style={containerStyle} className={`auth-container ${isCyberpunk ? 'cyberpunk-theme' : ''}`}>
         <div style={cardStyle} className="auth-card">
           <div style={titleStyle}>
             <h1 style={headingStyle} className="auth-heading">
-              Welcome to <span style={primaryTextStyle} className="auth-accent">Shhhhh</span>
+              Welcome to <span style={primaryTextStyle} className="auth-accent">Domaći Sokovi</span>
             </h1>
           </div>
 
