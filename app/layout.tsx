@@ -1,12 +1,13 @@
 import type React from "react"
 import "./globals.css"
+import "./juice-styles.css"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import Script from "next/script"
 
 export const metadata = {
-  title: "Calculator",
-  description: "A simple calculator app",
+  title: "Domaći Sokovi - Prirodni Sokovi iz Hrvatske",
+  description: "Domaći sokovi od svježeg voća, bez konzervansa i dodanog šećera. Pravo iz našeg voćnjaka do vašeg stola.",
   manifest: "/manifest.json",
   themeColor: "#000000",
   appleWebApp: {

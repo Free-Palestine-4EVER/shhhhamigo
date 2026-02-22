@@ -1,12 +1,12 @@
 "use client"
 
 import JuiceLayout from "@/components/juice/juice-layout"
-import HomePage from "@/components/juice/home-page"
+import ContactPage from "@/components/juice/contact-page"
 
 export default function Page() {
   return (
     <JuiceLayout>
-      <HomePage />
+      <ContactPage />
     </JuiceLayout>
   )
 }
