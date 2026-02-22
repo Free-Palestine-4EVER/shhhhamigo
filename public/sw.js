@@ -1,7 +1,4 @@
-// Import Pushpad service worker
-importScripts("https://pushpad.xyz/service-worker.js")
-
-// Keep existing service worker functionality
+// Service Worker
 self.addEventListener("install", (event) => {
   console.log("Service Worker installed")
   self.skipWaiting()
