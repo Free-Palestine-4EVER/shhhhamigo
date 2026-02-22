@@ -1440,9 +1440,6 @@ export default function ChatWindow({
         }}
         className={`flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative chat-window ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
       >
-        {/* Floating Elements */}
-        <div className="absolute top-10 left-10 w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-30 animate-pulse"></div>
-        <div className="absolute top-32 right-16 w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-40 animate-ping"></div>
         <div className="absolute bottom-20 left-20 w-1 h-1 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full opacity-50 animate-bounce"></div>
 
         <div style={{ textAlign: "center" }} className="text-center space-y-4">
@@ -1496,9 +1493,6 @@ export default function ChatWindow({
       }}
       className={`flex-1 flex flex-col bg-gradient-to-br from-slate-900/95 via-slate-800/95 to-slate-900/95 backdrop-blur-xl relative chat-window ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
     >
-      {/* Floating Elements */}
-      <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-40 animate-ping"></div>
-      <div className="absolute top-20 right-8 w-1 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-30 animate-pulse"></div>
 
       {/* Chat Header */}
       <div
@@ -1570,12 +1564,11 @@ export default function ChatWindow({
                     background: "rgb(30, 41, 59)",
                   }}
                 >
-                  <Image
+                  <img
                     src={groupData.photoURL || "/placeholder.svg"}
                     alt={groupData.name || "Group"}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
                 </div>
                 <div
                   style={{
@@ -1623,12 +1616,11 @@ export default function ChatWindow({
                     background: "rgb(30, 41, 59)",
                   }}
                 >
-                  <Image
+                  <img
                     src={selectedUser.photoURL || "/placeholder.svg"}
                     alt={selectedUser.username}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
                 </div>
                 {isUserOnline(selectedUser.id) && (
                   <div
@@ -1762,11 +1754,10 @@ export default function ChatWindow({
                     {isGroup && !isCurrentUser && (
                       <div className="relative w-8 h-8 overflow-hidden rounded-full flex-shrink-0 bg-gradient-to-r from-blue-500 to-purple-500 p-0.5">
                         <div className="w-full h-full rounded-full overflow-hidden bg-slate-800">
-                          <Image
+                          <img
                             src={sender.photoURL || "/placeholder.svg"}
                             alt={sender.username || "User"}
-                            fill
-                            className="object-cover"
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           />
                         </div>
                       </div>

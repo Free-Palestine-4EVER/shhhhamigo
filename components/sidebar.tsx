@@ -289,9 +289,7 @@ export default function Sidebar({
       }}
       className={`sidebar ${theme === 'cyberpunk' ? 'cyberpunk-theme' : ''}`}
     >
-      {/* Floating Elements */}
-      <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-60 animate-ping"></div>
-      <div className="absolute top-20 right-8 w-1 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full opacity-40 animate-pulse"></div>
+      {/* Floating elements removed */}
 
       {/* Header */}
       {/* Replaced with inline styles */}
@@ -332,13 +330,11 @@ export default function Sidebar({
                       background: "rgb(30, 41, 59)",
                     }}
                   >
-                    <Image
+                    <img
                       src={currentUser.photoURL || "/placeholder.svg"}
                       alt={currentUser.username}
-                      fill
-                      sizes="44px"
-                      style={{ objectFit: "cover" }}
-                    />
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
                   </div>
                   {/* Online indicator */}
                   <div
@@ -562,12 +558,11 @@ export default function Sidebar({
                             background: "rgb(30, 41, 59)",
                           }}
                         >
-                          <Image
+                          <img
                             src={user.photoURL || "/placeholder.svg"}
                             alt={user.username}
-                            fill
-                            style={{ objectFit: "cover" }}
-                          />
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
                         </div>
                       </div>
                       {isUserOnline(user.id) && (
@@ -697,12 +692,11 @@ export default function Sidebar({
                                   background: "rgb(30, 41, 59)",
                                 }}
                               >
-                                <Image
+                                <img
                                   src={getChatAvatar(chat) || "/placeholder.svg"}
                                   alt={getChatName(chat)}
-                                  fill
-                                  style={{ objectFit: "cover" }}
-                                />
+                                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                  />
                               </div>
                             </div>
                           ) : (
@@ -861,12 +855,11 @@ export default function Sidebar({
                             background: "rgb(30, 41, 59)",
                           }}
                         >
-                          <Image
+                          <img
                             src={getChatAvatar(group) || "/placeholder.svg"}
                             alt={getChatName(group)}
-                            fill
-                            style={{ objectFit: "cover" }}
-                          />
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
                         </div>
                         <div
                           style={{
