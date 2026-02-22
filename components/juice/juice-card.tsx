@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
 import { Juice } from "@/lib/juice-data"
 import { useCart } from "./cart-context"
 
@@ -9,11 +10,15 @@ export default function JuiceCard({ juice, large }: { juice: Juice; large?: bool
 
   return (
     <div className={`juice-card ${large ? "juice-card-large" : ""}`}>
-      <div
-        className="juice-card-image"
-        style={{ background: `linear-gradient(135deg, ${juice.color1}, ${juice.color2})` }}
-      >
-        <span className="juice-card-emoji">{juice.emoji}</span>
+      <div className="juice-card-image">
+        <Image
+          src={juice.imageUrl}
+          alt={juice.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 350px"
+          style={{ objectFit: "cover" }}
+        />
+        <div className="juice-card-image-overlay" />
       </div>
       <div className="juice-card-body">
         <h3 className="juice-card-title">{juice.name}</h3>

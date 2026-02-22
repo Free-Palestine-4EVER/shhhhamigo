@@ -2,6 +2,7 @@ export interface Juice {
   id: string
   name: string
   emoji: string
+  imageUrl: string
   price: number
   description: string
   longDescription: string
@@ -16,6 +17,7 @@ export const juices: Juice[] = [
     id: "jagoda",
     name: "Jagoda Sok",
     emoji: "🍓",
+    imageUrl: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?w=600",
     price: 4.99,
     description: "Svježe cijeđeni sok od domaćih jagoda",
     longDescription: "Naš sok od jagoda priprema se od ručno branih jagoda s obiteljskih polja. Bogat vitaminima C i antioksidansima, savršen za osvježenje u toplim danima.",
@@ -28,6 +30,7 @@ export const juices: Juice[] = [
     id: "visnja",
     name: "Višnja Sok",
     emoji: "🍒",
+    imageUrl: "https://images.unsplash.com/photo-1595981234058-a9302fb97229?w=600",
     price: 5.49,
     description: "Tart i osvježavajući sok od višnje",
     longDescription: "Višnja je kraljica voća! Naš sok od višnje ima savršen balans slatkog i kiselog okusa. Prirodno bogat melatoninom za bolji san.",
@@ -40,6 +43,7 @@ export const juices: Juice[] = [
     id: "jabuka",
     name: "Jabuka Sok",
     emoji: "🍎",
+    imageUrl: "https://images.unsplash.com/photo-1576673442511-7e39b6545c87?w=600",
     price: 3.99,
     description: "Klasični sok od svježih jabuka",
     longDescription: "Sok od jabuka iz našeg voćnjaka - bez dodanog šećera, bez konzervansa. Čist okus prirode u svakom gutljaju. Savršen za cijelu obitelj.",
@@ -51,6 +55,7 @@ export const juices: Juice[] = [
     id: "naranca",
     name: "Naranča Sok",
     emoji: "🍊",
+    imageUrl: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600",
     price: 4.49,
     description: "Sunčani sok od mediteranskih naranči",
     longDescription: "Naranče s mediteranskog sunca, cijeđene ujutro za maksimalnu svježinu. Bogat vitaminom C, idealan za početak dana.",
@@ -63,6 +68,7 @@ export const juices: Juice[] = [
     id: "borovnica",
     name: "Borovnica Sok",
     emoji: "🫐",
+    imageUrl: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=600",
     price: 6.49,
     description: "Premium sok od divljih borovnica",
     longDescription: "Divlje borovnice brane se na obroncima planina. Supernamirnica bogata antioksidansima. Naš najtraženiji premium sok.",
@@ -74,6 +80,7 @@ export const juices: Juice[] = [
     id: "mango",
     name: "Mango Sok",
     emoji: "🥭",
+    imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?w=600",
     price: 5.99,
     description: "Egzotični sok od zrelog manga",
     longDescription: "Tropski okus manga donosi egzotiku u vaš dom. Kremaste teksture i intenzivnog okusa, savršen sam ili u smoothiju.",
@@ -86,6 +93,7 @@ export const juices: Juice[] = [
     id: "limun-dumbir",
     name: "Limun i Đumbir",
     emoji: "🍋",
+    imageUrl: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600",
     price: 4.99,
     description: "Osvježavajuća kombinacija limuna i đumbira",
     longDescription: "Moćna kombinacija svježeg limuna i đumbira. Podiže imunitet, potiče probavu i daje energiju za cijeli dan. Naš wellness favorit.",
@@ -97,6 +105,7 @@ export const juices: Juice[] = [
     id: "sumsko-voce",
     name: "Šumsko Voće",
     emoji: "🫐",
+    imageUrl: "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=600",
     price: 5.49,
     description: "Mješavina šumskih bobica",
     longDescription: "Kupine, maline, borovnice i brusnice - sve u jednom soku. Bogat okus šume u boci. Prirodni izvor energije i vitalnosti.",
