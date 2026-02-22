@@ -1443,3 +1443,14 @@
 .secret-chat-overlay .cyberpunk-theme .shadow-blue-500\/25 {
   --tw-shadow-color: rgba(0, 212, 170, 0.25) !important;
 }
+
+/* Fix settings modal z-index inside secret chat */
+.secret-chat-overlay [data-state="open"][role="alertdialog"],
+.secret-chat-overlay [data-radix-portal],
+[data-radix-portal] {
+  z-index: 10010 !important;
+}
+
+[data-radix-portal] [data-state="open"] {
+  z-index: 10010 !important;
+}
