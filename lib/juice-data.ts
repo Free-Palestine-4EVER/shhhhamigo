@@ -105,7 +105,7 @@ export const juices: Juice[] = [
     id: "sumsko-voce",
     name: "Šumsko Voće",
     emoji: "🫐",
-    imageUrl: "https://images.unsplash.com/photo-1596095599159-10657f206be9?w=600",
+    imageUrl: "https://plus.unsplash.com/premium_photo-1669680784589-f91da5cb620d?w=600",
     price: 5.49,
     description: "Mješavina šumskih bobica",
     longDescription: "Kupine, maline, borovnice i brusnice - sve u jednom soku. Bogat okus šume u boci. Prirodni izvor energije i vitalnosti.",
