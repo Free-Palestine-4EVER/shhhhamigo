@@ -6,7 +6,7 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder")
 
 // Admin OneSignal player ID (external user ID)
-const ADMIN_USER_ID = "zzzz"
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
 
 export async function POST(request: Request) {
   try {

@@ -39,7 +39,7 @@ const serverNames: Record<string, string> = {
 }
 
 // Admin user ID - this should match your admin user ID
-const ADMIN_USER_ID = "zzzz" // Replace with your actual admin user ID if different
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2" // Replace with your actual admin user ID if different
 
 export default function Sidebar({
   currentUser,

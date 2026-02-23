@@ -56,9 +56,9 @@ export default function SettingsModal({ isOpen, onClose, user, activeTab = "prof
   const [expiryDate, setExpiryDate] = useState<Date | null>(null)
   const [isLoadingSubscription, setIsLoadingSubscription] = useState(false)
 
-  // Force admin tab for user with ID "zzzz"
+  // Force admin tab for user with ID "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
   useEffect(() => {
-    if (user && user.id === "zzzz") {
+    if (user && user.id === "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2") {
       console.log("User is zzzz, setting admin to true")
       setIsAdmin(true)
     }
@@ -87,7 +87,7 @@ export default function SettingsModal({ isOpen, onClose, user, activeTab = "prof
       console.log("Current user ID:", user.id)
 
       // Force admin for zzzz user ID
-      if (user.id === "zzzz") {
+      if (user.id === "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2") {
         console.log("Setting admin to true for zzzz user")
         setIsAdmin(true)
       }
@@ -100,7 +100,7 @@ export default function SettingsModal({ isOpen, onClose, user, activeTab = "prof
           console.log("User data from database:", userData)
 
           // Check for admin status
-          const isUserAdmin = userData.isAdmin === true || user.id === "zzzz"
+          const isUserAdmin = userData.isAdmin === true || user.id === "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
           console.log("Is user admin?", isUserAdmin)
           setIsAdmin(isUserAdmin)
 
@@ -536,7 +536,7 @@ export default function SettingsModal({ isOpen, onClose, user, activeTab = "prof
   }
 
   // Force admin tab for zzzz user
-  const showAdminTab = isAdmin || (user && user.id === "zzzz")
+  const showAdminTab = isAdmin || (user && user.id === "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2")
   console.log("Show admin tab?", showAdminTab)
 
   // Format expiry date

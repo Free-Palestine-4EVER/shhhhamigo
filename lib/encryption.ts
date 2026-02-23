@@ -3,7 +3,7 @@
 // E2E Encryption utilities using Web Crypto API
 // Uses hybrid encryption: RSA-OAEP for key exchange, AES-GCM for message content
 
-const ADMIN_USER_ID = "zzzz"
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
 
 // IndexedDB storage for private keys
 const DB_NAME = "chat_encryption"
