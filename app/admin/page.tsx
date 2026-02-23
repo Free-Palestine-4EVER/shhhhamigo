@@ -9,7 +9,7 @@ import MatrixBackground from "@/components/matrix-background"
 import { Button } from "@/components/ui/button"
 
 // Admin user ID
-const ADMIN_USER_ID = "zzzz"
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
 
 // Wrap the main component with FirebaseProvider
 export default function AdminPageWrapper() {

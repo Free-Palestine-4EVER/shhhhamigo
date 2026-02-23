@@ -8,7 +8,7 @@ import AnnouncementSystem from "@/components/admin/announcement-system"
 import AnalyticsDashboard from "@/components/admin/analytics-dashboard"
 
 // Admin user ID
-const ADMIN_USER_ID = "zzzz"
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
 
 export default function AdminPanel() {
   const { user } = useFirebase()

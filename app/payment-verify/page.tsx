@@ -27,7 +27,7 @@ interface Payment {
 }
 
 // Admin user ID - this should be your admin user ID
-const ADMIN_USER_ID = "zzzz"
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
 
 // Wrap the main component with FirebaseProvider
 export default function PaymentVerifyPageWrapper() {
