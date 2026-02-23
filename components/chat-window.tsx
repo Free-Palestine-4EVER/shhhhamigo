@@ -793,138 +793,154 @@ export default function ChatWindow({
     )
   }
 
-  // Modify the handleFileUpload function to use compression for videos
+  // Handle file upload (images & videos) — no compression, direct upload
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !currentUser || !selectedChat || (!selectedUser && !isGroup)) return
 
-    setIsUploading(true)
-    setUploadProgress(0)
+    // Reset the input so the same file can be selected again
+    e.target.value = ""
 
     const isVideo = file.type.startsWith("video/")
     const isImage = file.type.startsWith("image/")
-    const fileType = isImage ? "images" : "videos"
 
-    let fileToUpload = file
-
-    // Skip compression — upload original file directly
-    if (isVideo) {
-      console.log(`Uploading video: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`)
+    if (!isVideo && !isImage) {
+      alert("Only images and videos are supported.")
+      return
     }
 
-    const fileRef = storageRef(storage, `${fileType}/${selectedChat}/${Date.now()}_${file.name}`)
+    console.log(`[Upload] ${isVideo ? "Video" : "Image"}: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`)
 
-    const uploadTask = uploadBytesResumable(fileRef, fileToUpload)
+    setIsUploading(true)
+    setUploadProgress(0)
 
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        setUploadProgress(uploadProgress)
-      },
-      (error) => {
-        console.error("Error uploading file:", error)
-        alert(`Failed to upload file: ${error.message}`)
-        setIsUploading(false)
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+    try {
+      // 1. Read file as ArrayBuffer first to ensure we have all the bytes
+      const arrayBuffer = await file.arrayBuffer()
+      const blob = new Blob([arrayBuffer], { type: file.type })
+      console.log(`[Upload] Blob ready: ${(blob.size / 1024 / 1024).toFixed(2)}MB`)
 
-        try {
-          // Create a new message with the file URL
-          const messagesRef = dbRef(db, `messages/${selectedChat}`)
-          const newMessageRef = push(messagesRef)
+      // 2. Upload to Firebase Storage
+      const folder = isImage ? "images" : "videos"
+      const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg")
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
+      const fileRef = storageRef(storage, `${folder}/${selectedChat}/${fileName}`)
 
-          const messageData: any = {
-            text: null, // Remove the text for both image and video
-            senderId: currentUser.id,
-            timestamp: serverTimestamp(),
-            reactions: {},
-            ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
-          }
+      const metadata = {
+        contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg"),
+      }
 
-          if (isGroup) {
-            // For groups, initialize readBy with current user
-            messageData.readBy = { [currentUser.id]: true }
-          } else {
-            // For direct chats, set receiverId and read status
-            messageData.receiverId = selectedUser?.id
-            messageData.read = false
-          }
+      const uploadTask = uploadBytesResumable(fileRef, blob, metadata)
 
-          await set(newMessageRef, messageData)
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          console.log(`[Upload] Progress: ${progress.toFixed(1)}%`)
+          setUploadProgress(progress)
+        },
+        (error) => {
+          console.error("[Upload] Failed:", error)
+          alert(`Upload failed: ${error.message}`)
+          setIsUploading(false)
+        },
+        async () => {
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+            console.log(`[Upload] Complete. URL: ${downloadURL.slice(0, 80)}...`)
 
-          // Update last message in chat - FIXED: Don't include receiverId for groups
-          const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
-          const lastMessageData: any = {
-            id: newMessageRef.key,
-            text: isImage ? "Sent an image" : "Sent a video", // Keep text for sidebar preview only
-            senderId: currentUser.id,
-            timestamp: new Date().toISOString(),
-            read: false,
-            ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
-          }
+            // 3. Create message
+            const messagesRef = dbRef(db, `messages/${selectedChat}`)
+            const newMessageRef = push(messagesRef)
 
-          // Only add receiverId for direct chats, NOT for groups
-          if (!isGroup && selectedUser) {
-            lastMessageData.receiverId = selectedUser.id
-          }
-
-          // Add readBy for groups
-          if (isGroup) {
-            lastMessageData.readBy = { [currentUser.id]: true }
-          }
-
-          await update(chatRef, {
-            lastMessage: lastMessageData,
-            updatedAt: serverTimestamp(),
-          })
-
-          // Send push notification
-          if (isGroup && groupData) {
-            // For groups, notify all members except the sender
-            const participantIds = Array.isArray(groupData.participants)
-              ? groupData.participants
-              : Object.keys(groupData.participants || {})
-
-            participantIds.forEach(async (participantId) => {
-              if (participantId !== currentUser.id && !isUserOnline(participantId)) {
-                try {
-                  await sendMessageNotification(
-                    participantId,
-                    `${currentUser.username} in ${groupData.name}`,
-                    isImage ? "Sent you an image" : "Sent you a video",
-                    selectedChat,
-                    currentUser.photoURL,
-                  )
-                } catch (error) {
-                  console.error("Error sending group notification:", error)
-                }
-              }
-            })
-          } else if (selectedUser && !isUserOnline(selectedUser.id)) {
-            // For direct chats, notify the other user if they're offline
-            try {
-              await sendMessageNotification(
-                selectedUser.id,
-                currentUser.username,
-                isImage ? "Sent you an image" : "Sent you a video",
-                selectedChat,
-                currentUser.photoURL,
-              )
-            } catch (error) {
-              console.error("Error sending notification:", error)
+            const messageData: any = {
+              text: null,
+              senderId: currentUser.id,
+              timestamp: serverTimestamp(),
+              reactions: {},
+              ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
             }
-          }
 
-          setIsUploading(false)
-        } catch (error: any) {
-          console.error("Error sending file message:", error)
-          alert(`Failed to send file message: ${error.message}`)
-          setIsUploading(false)
-        }
-      },
-    )
+            if (isGroup) {
+              messageData.readBy = { [currentUser.id]: true }
+            } else {
+              messageData.receiverId = selectedUser?.id
+              messageData.read = false
+            }
+
+            await set(newMessageRef, messageData)
+
+            // 4. Update last message in chat
+            const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
+            const lastMessageData: any = {
+              id: newMessageRef.key,
+              text: isImage ? "Sent an image" : "Sent a video",
+              senderId: currentUser.id,
+              timestamp: new Date().toISOString(),
+              read: false,
+              ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
+            }
+
+            if (!isGroup && selectedUser) {
+              lastMessageData.receiverId = selectedUser.id
+            }
+            if (isGroup) {
+              lastMessageData.readBy = { [currentUser.id]: true }
+            }
+
+            await update(chatRef, {
+              lastMessage: lastMessageData,
+              updatedAt: serverTimestamp(),
+            })
+
+            // 5. Send push notification
+            if (isGroup && groupData) {
+              const participantIds = Array.isArray(groupData.participants)
+                ? groupData.participants
+                : Object.keys(groupData.participants || {})
+
+              participantIds.forEach(async (participantId) => {
+                if (participantId !== currentUser.id && !isUserOnline(participantId)) {
+                  try {
+                    await sendMessageNotification(
+                      participantId,
+                      `${currentUser.username} in ${groupData.name}`,
+                      isImage ? "Sent you an image" : "Sent you a video",
+                      selectedChat,
+                      currentUser.photoURL,
+                    )
+                  } catch (error) {
+                    console.error("Error sending group notification:", error)
+                  }
+                }
+              })
+            } else if (selectedUser && !isUserOnline(selectedUser.id)) {
+              try {
+                await sendMessageNotification(
+                  selectedUser.id,
+                  currentUser.username,
+                  isImage ? "Sent you an image" : "Sent you a video",
+                  selectedChat,
+                  currentUser.photoURL,
+                )
+              } catch (error) {
+                console.error("Error sending notification:", error)
+              }
+            }
+
+            setIsUploading(false)
+          } catch (error: any) {
+            console.error("[Upload] Message creation failed:", error)
+            alert(`Failed to send: ${error.message}`)
+            setIsUploading(false)
+          }
+        },
+      )
+    } catch (error: any) {
+      console.error("[Upload] Error reading file:", error)
+      alert(`Failed to read file: ${error.message}`)
+      setIsUploading(false)
+    }
   }
 
   // Updated voice recording handler
