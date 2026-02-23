@@ -12,9 +12,6 @@ interface ServerSelectionModalProps {
 
 const servers = [
   { id: "russia", name: "Russia", flag: "🇷🇺", label: "Fastest", ping: "45ms", color: "#7df9ff" },
-  { id: "hongkong", name: "Hong Kong", flag: "🇭🇰", ping: "120ms", color: "#ff7d7d" },
-  { id: "malta", name: "Malta", flag: "🇲🇹", ping: "180ms", color: "#ffd77d" },
-  { id: "china", name: "China", flag: "🇨🇳", ping: "210ms", color: "#ff7dff" },
 ]
 
 export default function ServerSelectionModal({ isOpen, onServerSelect }: ServerSelectionModalProps) {
