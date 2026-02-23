@@ -1746,6 +1746,8 @@ export default function ChatWindow({
                           <video
                             src={message.videoUrl}
                             controls
+                            playsInline
+                            preload="metadata"
                             className="message-video w-full max-h-[300px] rounded-xl shadow-lg"
                           />
 
