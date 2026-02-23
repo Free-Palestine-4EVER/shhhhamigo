@@ -827,33 +827,39 @@ export default function ChatWindow({
 
       const metadata = { contentType }
 
-      // Use simple uploadBytes for videos (more reliable on mobile Safari)
-      // Use resumable for images (they're smaller and benefit from progress)
-      let downloadURL: string
+      // Read the entire file into memory first using FileReader
+      // This is critical for iOS Safari which does lazy file loading
+      const fileData: Uint8Array = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => {
+          if (reader.result instanceof ArrayBuffer) {
+            resolve(new Uint8Array(reader.result))
+          } else {
+            reject(new Error("FileReader did not return ArrayBuffer"))
+          }
+        }
+        reader.onerror = () => reject(reader.error)
+        reader.readAsArrayBuffer(file)
+      })
 
-      if (isVideo) {
-        setUploadProgress(10)
-        const snapshot = await uploadBytes(fileRef, file, metadata)
-        setUploadProgress(90)
-        downloadURL = await getDownloadURL(snapshot.ref)
-        setUploadProgress(100)
-      } else {
-        // Resumable upload for images with progress
-        downloadURL = await new Promise<string>((resolve, reject) => {
-          const uploadTask = uploadBytesResumable(fileRef, file, metadata)
-          uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-              setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-            },
-            (error) => reject(error),
-            async () => {
-              const url = await getDownloadURL(uploadTask.snapshot.ref)
-              resolve(url)
-            },
-          )
-        })
-      }
+      setUploadProgress(20)
+
+      // Upload using resumable with the fully-read data
+      const downloadURL: string = await new Promise<string>((resolve, reject) => {
+        const uploadTask = uploadBytesResumable(fileRef, fileData, metadata)
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = 20 + (snapshot.bytesTransferred / snapshot.totalBytes) * 80
+            setUploadProgress(progress)
+          },
+          (error) => reject(error),
+          async () => {
+            const url = await getDownloadURL(uploadTask.snapshot.ref)
+            resolve(url)
+          },
+        )
+      })
 
       // Create message
       const messagesRef = dbRef(db, `messages/${selectedChat}`)
