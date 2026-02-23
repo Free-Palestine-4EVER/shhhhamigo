@@ -793,15 +793,15 @@ export default function ChatWindow({
     )
   }
 
-  // Handle file upload (images & videos)
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Ref to store file data immediately when selected (before iOS can invalidate it)
+  const pendingFileData = useRef<{ blob: Blob; name: string; type: string; isVideo: boolean } | null>(null)
+
+  // Step 1: When file is selected, IMMEDIATELY read all bytes into memory
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file || !currentUser || !selectedChat || (!selectedUser && !isGroup)) return
+    if (!file) return
 
-    // Reset input
-    if (e.target) e.target.value = ""
-
-    const isVideo = file.type.startsWith("video/") || file.name.match(/\.(mov|mp4|webm|avi|m4v)$/i)
+    const isVideo = file.type.startsWith("video/") || /\.(mov|mp4|webm|avi|m4v)$/i.test(file.name)
     const isImage = file.type.startsWith("image/")
 
     if (!isVideo && !isImage) {
@@ -809,47 +809,57 @@ export default function ChatWindow({
       return
     }
 
+    // Read IMMEDIATELY — do not await anything before this
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        let contentType = file.type
+        if (!contentType || contentType === "application/octet-stream") {
+          contentType = isVideo ? "video/mp4" : "image/jpeg"
+        }
+        const blob = new Blob([reader.result], { type: contentType })
+        pendingFileData.current = { blob, name: file.name, type: contentType, isVideo }
+        // Now trigger the actual upload
+        doFileUpload()
+      }
+    }
+    reader.onerror = () => {
+      alert("Failed to read file. Please try again.")
+    }
+    reader.readAsArrayBuffer(file)
+
+    // Reset input
+    if (e.target) e.target.value = ""
+  }
+
+  // Step 2: Upload the already-read data
+  const doFileUpload = async () => {
+    const fileInfo = pendingFileData.current
+    if (!fileInfo || !currentUser || !selectedChat || (!selectedUser && !isGroup)) return
+    pendingFileData.current = null
+
+    const { blob, name, type: contentType, isVideo } = fileInfo
+    const isImage = !isVideo
+
     setIsUploading(true)
     setUploadProgress(0)
 
     try {
       const folder = isImage ? "images" : "videos"
-      const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg")
+      const ext = name.split(".").pop() || (isVideo ? "mp4" : "jpg")
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
       const fileRef = storageRef(storage, `${folder}/${selectedChat}/${fileName}`)
-
-      // Determine content type — iOS often gives video/quicktime for .mov files
-      let contentType = file.type
-      if (!contentType || contentType === "application/octet-stream") {
-        if (isVideo) contentType = "video/mp4"
-        else contentType = "image/jpeg"
-      }
-
       const metadata = { contentType }
 
-      // iOS Safari fix: create object URL then fetch it back as blob
-      // This forces the OS to fully materialize the file data in memory
-      // before we hand it to Firebase (iOS lazily loads picked videos)
-      const objectUrl = URL.createObjectURL(file)
-      const response = await fetch(objectUrl)
-      const fileBlob = await response.blob()
-      URL.revokeObjectURL(objectUrl)
+      setUploadProgress(10)
 
-      console.log(`[Upload] File: ${file.name}, original size: ${file.size}, blob size: ${fileBlob.size}, type: ${contentType}`)
-
-      if (fileBlob.size < 1000) {
-        throw new Error(`File appears empty (${fileBlob.size} bytes). Please try again.`)
-      }
-
-      setUploadProgress(15)
-
-      // Upload the blob
+      // Upload the fully-read blob
       const downloadURL: string = await new Promise<string>((resolve, reject) => {
-        const uploadTask = uploadBytesResumable(fileRef, fileBlob, metadata)
+        const uploadTask = uploadBytesResumable(fileRef, blob, metadata)
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress = 15 + (snapshot.bytesTransferred / snapshot.totalBytes) * 85
+            const progress = 10 + (snapshot.bytesTransferred / snapshot.totalBytes) * 90
             setUploadProgress(progress)
           },
           (error) => reject(error),
@@ -1976,7 +1986,7 @@ export default function ChatWindow({
                 <input
                   type="file"
                   ref={fileInputRef}
-                  onChange={handleFileUpload}
+                  onChange={handleFileSelect}
                   accept="image/*,video/*"
                   className="hidden"
                 />
