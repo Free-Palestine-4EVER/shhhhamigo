@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Paperclip, Send, Trash2, RefreshCw, Heart, ArrowLeft, Mic, X, Maximize, Users, Sparkles, Timer } from "lucide-react"
 import { db, storage } from "@/lib/firebase"
 import { ref as dbRef, onValue, push, set, update, remove, get, serverTimestamp } from "firebase/database"
-import { ref as storageRef, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
+import { ref as storageRef, uploadBytesResumable, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import VoiceMessage from "@/components/voice-message"
 import VoiceRecorder from "@/components/voice-recorder"
@@ -793,15 +793,15 @@ export default function ChatWindow({
     )
   }
 
-  // Handle file upload (images & videos) — no compression, direct upload
+  // Handle file upload (images & videos)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !currentUser || !selectedChat || (!selectedUser && !isGroup)) return
 
-    // Reset the input so the same file can be selected again
-    e.target.value = ""
+    // Reset input
+    if (e.target) e.target.value = ""
 
-    const isVideo = file.type.startsWith("video/")
+    const isVideo = file.type.startsWith("video/") || file.name.match(/\.(mov|mp4|webm|avi|m4v)$/i)
     const isImage = file.type.startsWith("image/")
 
     if (!isVideo && !isImage) {
@@ -809,136 +809,135 @@ export default function ChatWindow({
       return
     }
 
-    console.log(`[Upload] ${isVideo ? "Video" : "Image"}: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`)
-
     setIsUploading(true)
     setUploadProgress(0)
 
     try {
-      // 1. Read file as ArrayBuffer first to ensure we have all the bytes
-      const arrayBuffer = await file.arrayBuffer()
-      const blob = new Blob([arrayBuffer], { type: file.type })
-      console.log(`[Upload] Blob ready: ${(blob.size / 1024 / 1024).toFixed(2)}MB`)
-
-      // 2. Upload to Firebase Storage
       const folder = isImage ? "images" : "videos"
       const ext = file.name.split(".").pop() || (isVideo ? "mp4" : "jpg")
       const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`
       const fileRef = storageRef(storage, `${folder}/${selectedChat}/${fileName}`)
 
-      const metadata = {
-        contentType: file.type || (isVideo ? "video/mp4" : "image/jpeg"),
+      // Determine content type — iOS often gives video/quicktime for .mov files
+      let contentType = file.type
+      if (!contentType || contentType === "application/octet-stream") {
+        if (isVideo) contentType = "video/mp4"
+        else contentType = "image/jpeg"
       }
 
-      const uploadTask = uploadBytesResumable(fileRef, blob, metadata)
+      const metadata = { contentType }
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          console.log(`[Upload] Progress: ${progress.toFixed(1)}%`)
-          setUploadProgress(progress)
-        },
-        (error) => {
-          console.error("[Upload] Failed:", error)
-          alert(`Upload failed: ${error.message}`)
-          setIsUploading(false)
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-            console.log(`[Upload] Complete. URL: ${downloadURL.slice(0, 80)}...`)
+      // Use simple uploadBytes for videos (more reliable on mobile Safari)
+      // Use resumable for images (they're smaller and benefit from progress)
+      let downloadURL: string
 
-            // 3. Create message
-            const messagesRef = dbRef(db, `messages/${selectedChat}`)
-            const newMessageRef = push(messagesRef)
+      if (isVideo) {
+        setUploadProgress(10)
+        const snapshot = await uploadBytes(fileRef, file, metadata)
+        setUploadProgress(90)
+        downloadURL = await getDownloadURL(snapshot.ref)
+        setUploadProgress(100)
+      } else {
+        // Resumable upload for images with progress
+        downloadURL = await new Promise<string>((resolve, reject) => {
+          const uploadTask = uploadBytesResumable(fileRef, file, metadata)
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            },
+            (error) => reject(error),
+            async () => {
+              const url = await getDownloadURL(uploadTask.snapshot.ref)
+              resolve(url)
+            },
+          )
+        })
+      }
 
-            const messageData: any = {
-              text: null,
-              senderId: currentUser.id,
-              timestamp: serverTimestamp(),
-              reactions: {},
-              ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
+      // Create message
+      const messagesRef = dbRef(db, `messages/${selectedChat}`)
+      const newMessageRef = push(messagesRef)
+
+      const messageData: any = {
+        text: null,
+        senderId: currentUser.id,
+        timestamp: serverTimestamp(),
+        reactions: {},
+        ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
+      }
+
+      if (isGroup) {
+        messageData.readBy = { [currentUser.id]: true }
+      } else {
+        messageData.receiverId = selectedUser?.id
+        messageData.read = false
+      }
+
+      await set(newMessageRef, messageData)
+
+      // Update last message
+      const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
+      const lastMessageData: any = {
+        id: newMessageRef.key,
+        text: isImage ? "Sent an image" : "Sent a video",
+        senderId: currentUser.id,
+        timestamp: new Date().toISOString(),
+        read: false,
+        ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
+      }
+
+      if (!isGroup && selectedUser) {
+        lastMessageData.receiverId = selectedUser.id
+      }
+      if (isGroup) {
+        lastMessageData.readBy = { [currentUser.id]: true }
+      }
+
+      await update(chatRef, {
+        lastMessage: lastMessageData,
+        updatedAt: serverTimestamp(),
+      })
+
+      // Send push notification
+      if (isGroup && groupData) {
+        const participantIds = Array.isArray(groupData.participants)
+          ? groupData.participants
+          : Object.keys(groupData.participants || {})
+
+        for (const participantId of participantIds) {
+          if (participantId !== currentUser.id && !isUserOnline(participantId)) {
+            try {
+              await sendMessageNotification(
+                participantId,
+                `${currentUser.username} in ${groupData.name}`,
+                isImage ? "Sent you an image" : "Sent you a video",
+                selectedChat,
+                currentUser.photoURL,
+              )
+            } catch (error) {
+              console.error("Error sending group notification:", error)
             }
-
-            if (isGroup) {
-              messageData.readBy = { [currentUser.id]: true }
-            } else {
-              messageData.receiverId = selectedUser?.id
-              messageData.read = false
-            }
-
-            await set(newMessageRef, messageData)
-
-            // 4. Update last message in chat
-            const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
-            const lastMessageData: any = {
-              id: newMessageRef.key,
-              text: isImage ? "Sent an image" : "Sent a video",
-              senderId: currentUser.id,
-              timestamp: new Date().toISOString(),
-              read: false,
-              ...(isImage ? { imageUrl: downloadURL } : { videoUrl: downloadURL }),
-            }
-
-            if (!isGroup && selectedUser) {
-              lastMessageData.receiverId = selectedUser.id
-            }
-            if (isGroup) {
-              lastMessageData.readBy = { [currentUser.id]: true }
-            }
-
-            await update(chatRef, {
-              lastMessage: lastMessageData,
-              updatedAt: serverTimestamp(),
-            })
-
-            // 5. Send push notification
-            if (isGroup && groupData) {
-              const participantIds = Array.isArray(groupData.participants)
-                ? groupData.participants
-                : Object.keys(groupData.participants || {})
-
-              participantIds.forEach(async (participantId) => {
-                if (participantId !== currentUser.id && !isUserOnline(participantId)) {
-                  try {
-                    await sendMessageNotification(
-                      participantId,
-                      `${currentUser.username} in ${groupData.name}`,
-                      isImage ? "Sent you an image" : "Sent you a video",
-                      selectedChat,
-                      currentUser.photoURL,
-                    )
-                  } catch (error) {
-                    console.error("Error sending group notification:", error)
-                  }
-                }
-              })
-            } else if (selectedUser && !isUserOnline(selectedUser.id)) {
-              try {
-                await sendMessageNotification(
-                  selectedUser.id,
-                  currentUser.username,
-                  isImage ? "Sent you an image" : "Sent you a video",
-                  selectedChat,
-                  currentUser.photoURL,
-                )
-              } catch (error) {
-                console.error("Error sending notification:", error)
-              }
-            }
-
-            setIsUploading(false)
-          } catch (error: any) {
-            console.error("[Upload] Message creation failed:", error)
-            alert(`Failed to send: ${error.message}`)
-            setIsUploading(false)
           }
-        },
-      )
+        }
+      } else if (selectedUser && !isUserOnline(selectedUser.id)) {
+        try {
+          await sendMessageNotification(
+            selectedUser.id,
+            currentUser.username,
+            isImage ? "Sent you an image" : "Sent you a video",
+            selectedChat,
+            currentUser.photoURL,
+          )
+        } catch (error) {
+          console.error("Error sending notification:", error)
+        }
+      }
+
+      setIsUploading(false)
     } catch (error: any) {
-      console.error("[Upload] Error reading file:", error)
-      alert(`Failed to read file: ${error.message}`)
+      console.error("Upload failed:", error)
+      alert(`Upload failed: ${error.message}`)
       setIsUploading(false)
     }
   }
