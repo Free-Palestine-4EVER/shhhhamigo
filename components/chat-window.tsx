@@ -796,8 +796,8 @@ export default function ChatWindow({
   // Ref to store file data immediately when selected (before iOS can invalidate it)
   const pendingFileData = useRef<{ blob: Blob; name: string; type: string; isVideo: boolean } | null>(null)
 
-  // Step 1: When file is selected, IMMEDIATELY read all bytes into memory
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Step 1: When file is selected, wait for iOS to finish processing, then read
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -809,24 +809,79 @@ export default function ChatWindow({
       return
     }
 
-    // Read IMMEDIATELY — do not await anything before this
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (reader.result instanceof ArrayBuffer) {
-        let contentType = file.type
-        if (!contentType || contentType === "application/octet-stream") {
-          contentType = isVideo ? "video/mp4" : "image/jpeg"
-        }
-        const blob = new Blob([reader.result], { type: contentType })
-        pendingFileData.current = { blob, name: file.name, type: contentType, isVideo }
-        // Now trigger the actual upload
-        doFileUpload()
+    // Show loading state immediately
+    setIsUploading(true)
+    setUploadProgress(0)
+
+    try {
+      let fileToRead: Blob = file
+
+      // For videos: load into a <video> element and wait for full load
+      // This forces iOS to complete transcoding before we read the bytes
+      if (isVideo) {
+        setUploadProgress(5)
+        const blobUrl = URL.createObjectURL(file)
+
+        await new Promise<void>((resolve, reject) => {
+          const video = document.createElement("video")
+          video.preload = "auto"
+          video.playsInline = true
+          video.muted = true
+          video.src = blobUrl
+
+          const timeout = setTimeout(() => {
+            cleanup()
+            resolve() // proceed anyway after timeout
+          }, 30000) // 30s max wait
+
+          const cleanup = () => {
+            clearTimeout(timeout)
+            video.removeAttribute("src")
+            video.load()
+            video.remove()
+          }
+
+          video.oncanplaythrough = () => {
+            cleanup()
+            resolve()
+          }
+
+          video.onerror = () => {
+            cleanup()
+            resolve() // proceed anyway
+          }
+
+          // Also try to trigger loading
+          video.load()
+        })
+
+        // Now fetch the blob from the object URL — file should be fully transcoded
+        const resp = await fetch(blobUrl)
+        fileToRead = await resp.blob()
+        URL.revokeObjectURL(blobUrl)
+
+        console.log(`[Upload] Video ready: ${file.name}, size: ${fileToRead.size} bytes (${(fileToRead.size / 1024 / 1024).toFixed(2)}MB)`)
       }
+
+      setUploadProgress(10)
+
+      // Read into ArrayBuffer
+      const arrayBuffer = await fileToRead.arrayBuffer()
+      let contentType = file.type
+      if (!contentType || contentType === "application/octet-stream") {
+        contentType = isVideo ? "video/mp4" : "image/jpeg"
+      }
+      const blob = new Blob([arrayBuffer], { type: contentType })
+
+      console.log(`[Upload] Blob ready: ${blob.size} bytes, type: ${contentType}`)
+
+      pendingFileData.current = { blob, name: file.name, type: contentType, isVideo }
+      doFileUpload()
+    } catch (error: any) {
+      console.error("[Upload] File preparation failed:", error)
+      alert(`Failed to prepare file: ${error.message}`)
+      setIsUploading(false)
     }
-    reader.onerror = () => {
-      alert("Failed to read file. Please try again.")
-    }
-    reader.readAsArrayBuffer(file)
 
     // Reset input
     if (e.target) e.target.value = ""
@@ -840,9 +895,6 @@ export default function ChatWindow({
 
     const { blob, name, type: contentType, isVideo } = fileInfo
     const isImage = !isVideo
-
-    setIsUploading(true)
-    setUploadProgress(0)
 
     try {
       const folder = isImage ? "images" : "videos"
