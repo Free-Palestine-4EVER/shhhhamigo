@@ -43,7 +43,16 @@ interface ChatWindowProps {
 async function compressVideo(videoFile: File): Promise<Blob> {
   console.log("Starting video compression...")
 
-  // If under 15MB, skip compression — just upload directly
+  // Detect iOS/Safari — canvas compression is broken on iOS, just upload raw
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  
+  if (isIOS || isSafari) {
+    console.log("iOS/Safari detected — skipping video compression, uploading original")
+    return videoFile
+  }
+
+  // If under 15MB, skip compression
   if (videoFile.size < 15 * 1024 * 1024) {
     console.log("Video under 15MB, skipping compression")
     return videoFile
@@ -58,12 +67,8 @@ async function compressVideo(videoFile: File): Promise<Blob> {
     }
   }
 
-  // Safari iOS often has no MediaRecorder or no supported types — just upload raw
   if (!isSupported || !mimeType) {
     console.log("MediaRecorder not available, uploading original video")
-    if (videoFile.size > 100 * 1024 * 1024) {
-      throw new Error("Video too large (max 100MB). Please use a shorter clip.")
-    }
     return videoFile
   }
 
