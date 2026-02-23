@@ -43,109 +43,104 @@ interface ChatWindowProps {
 async function compressVideo(videoFile: File): Promise<Blob> {
   console.log("Starting video compression...")
 
+  // If under 15MB, skip compression — just upload directly
+  if (videoFile.size < 15 * 1024 * 1024) {
+    console.log("Video under 15MB, skipping compression")
+    return videoFile
+  }
+
+  // Check MediaRecorder support and find a working mime type
+  const isSupported = typeof MediaRecorder !== "undefined"
+  let mimeType = ""
+  if (isSupported) {
+    for (const t of ["video/mp4", "video/webm;codecs=h264", "video/webm;codecs=vp9", "video/webm"]) {
+      if (MediaRecorder.isTypeSupported(t)) { mimeType = t; break }
+    }
+  }
+
+  // Safari iOS often has no MediaRecorder or no supported types — just upload raw
+  if (!isSupported || !mimeType) {
+    console.log("MediaRecorder not available, uploading original video")
+    if (videoFile.size > 100 * 1024 * 1024) {
+      throw new Error("Video too large (max 100MB). Please use a shorter clip.")
+    }
+    return videoFile
+  }
+
   try {
-    // Create a video element to get video dimensions
     const videoEl = document.createElement("video")
     const videoUrl = URL.createObjectURL(videoFile)
 
-    // Set up video element
     videoEl.src = videoUrl
     videoEl.muted = true
+    videoEl.playsInline = true
+    videoEl.setAttribute("playsinline", "")
+    videoEl.setAttribute("webkit-playsinline", "")
 
-    // Wait for video metadata to load
-    await new Promise<void>((resolve) => {
+    await new Promise<void>((resolve, reject) => {
       videoEl.onloadedmetadata = () => resolve()
+      videoEl.onerror = () => reject(new Error("Failed to load video"))
+      setTimeout(() => reject(new Error("Video metadata timeout")), 10000)
     })
 
-    // Get video dimensions
     const originalWidth = videoEl.videoWidth
     const originalHeight = videoEl.videoHeight
-
-    // Calculate new dimensions (max 720p)
     const maxHeight = 720
     const aspectRatio = originalWidth / originalHeight
     const newHeight = Math.min(maxHeight, originalHeight)
     const newWidth = Math.round(newHeight * aspectRatio)
 
-    console.log(`Original dimensions: ${originalWidth}x${originalHeight}`)
-    console.log(`New dimensions: ${newWidth}x${newHeight}`)
+    console.log(`Compressing ${originalWidth}x${originalHeight} → ${newWidth}x${newHeight}, mimeType: ${mimeType}`)
 
-    // Create canvas for compression
     const canvas = document.createElement("canvas")
     canvas.width = newWidth
     canvas.height = newHeight
     const ctx = canvas.getContext("2d")
+    if (!ctx) throw new Error("Could not get canvas context")
 
-    if (!ctx) {
-      throw new Error("Could not get canvas context")
-    }
+    await videoEl.play()
 
-    // Play the video (needed for some browsers)
-    videoEl.play()
-
-    // Create a MediaRecorder to capture the canvas
-    const stream = canvas.captureStream(30) // 30 FPS
-    const mediaRecorder = new MediaRecorder(stream, {
-      mimeType: "video/webm;codecs=vp9", // Use VP9 for better compression
-      videoBitsPerSecond: 1000000, // 1 Mbps
-    })
+    const stream = canvas.captureStream(24)
+    const mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 800000 })
 
     const chunks: Blob[] = []
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) {
-        chunks.push(e.data)
-      }
-    }
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
 
-    // Create a promise that resolves when recording is stopped
+    const outputType = mimeType.split(";")[0]
     const recordingPromise = new Promise<Blob>((resolve) => {
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "video/webm" })
-        resolve(blob)
-
-        // Clean up
+        const blob = new Blob(chunks, { type: outputType })
         URL.revokeObjectURL(videoUrl)
         videoEl.remove()
         canvas.remove()
+        resolve(blob)
       }
     })
 
-    // Start recording
-    mediaRecorder.start()
+    mediaRecorder.start(1000)
 
-    // Draw video frames to canvas
     const drawFrame = () => {
       if (videoEl.ended || videoEl.paused) {
-        mediaRecorder.stop()
+        if (mediaRecorder.state === "recording") mediaRecorder.stop()
         return
       }
-
       ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height)
       requestAnimationFrame(drawFrame)
     }
-
     drawFrame()
 
-    // Set up video end event
-    videoEl.onended = () => {
-      mediaRecorder.stop()
-    }
-
-    // If video doesn't end naturally after 60 seconds, stop recording
-    // This is a safety measure
+    videoEl.onended = () => { if (mediaRecorder.state === "recording") mediaRecorder.stop() }
     setTimeout(() => {
-      if (mediaRecorder.state === "recording") {
-        videoEl.pause()
-        mediaRecorder.stop()
-      }
-    }, 60000)
+      if (mediaRecorder.state === "recording") { videoEl.pause(); mediaRecorder.stop() }
+    }, 120000)
 
-    // Return the compressed video blob
     const compressedBlob = await recordingPromise
     console.log(
       `Compression complete. Original size: ${videoFile.size / 1024 / 1024}MB, Compressed size: ${compressedBlob.size / 1024 / 1024}MB`,
     )
 
+    // If compression made it bigger, use original
+    if (compressedBlob.size >= videoFile.size) return videoFile
     return compressedBlob
   } catch (error) {
     console.error("Error during video compression:", error)
@@ -921,7 +916,7 @@ export default function ChatWindow({
         console.log("Compressing video before upload...")
         setUploadProgress(5) // Show some initial progress
         const compressedVideo = await compressVideo(file)
-        fileToUpload = new File([compressedVideo], file.name, { type: "video/webm" })
+        fileToUpload = new File([compressedVideo], file.name, { type: compressedVideo.type || file.type })
         console.log(
           `Video compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`,
         )

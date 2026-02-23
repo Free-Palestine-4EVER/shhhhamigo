@@ -3,43 +3,43 @@
     "users": {
       ".indexOn": ["createdAt", "lastSeen"],
       ".read": "auth != null",
-      ".write": "auth != null && auth.uid === 'zzzz'",
+      ".write": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
       "$userId": {
         ".read": "auth != null",
-        ".write": "auth != null && (auth.uid === $userId || auth.uid === 'zzzz')"
+        ".write": "auth != null && (auth.uid === $userId || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')"
       }
     },
     "payments": {
-      ".read": "auth != null && auth.uid === 'zzzz'",
+      ".read": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
       ".write": "auth != null",
       "$paymentId": {
-        ".read": "auth != null && (auth.uid === root.child('payments').child($paymentId).child('userId').val() || auth.uid === 'zzzz')",
-        ".write": "auth != null && (auth.uid === root.child('payments').child($paymentId).child('userId').val() || auth.uid === 'zzzz')"
+        ".read": "auth != null && (auth.uid === root.child('payments').child($paymentId).child('userId').val() || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
+        ".write": "auth != null && (auth.uid === root.child('payments').child($paymentId).child('userId').val() || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')"
       }
     },
     "chats": {
       ".indexOn": ["updatedAt"],
-      ".read": "auth != null && auth.uid === 'zzzz'",
+      ".read": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
       "$chatId": {
-        ".read": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')",
-        ".write": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')",
+        ".read": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
+        ".write": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
         "messages": {
           ".indexOn": ["timestamp"],
-          ".read": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')",
-          ".write": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')"
+          ".read": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
+          ".write": "auth != null && (root.child('chats').child($chatId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')"
         }
       }
     },
     "groups": {
       ".indexOn": ["updatedAt"],
-      ".read": "auth != null && auth.uid === 'zzzz'",
+      ".read": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
       "$groupId": {
-        ".read": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')",
-        ".write": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || root.child('groups').child($groupId).child('admins').hasChild(auth.uid) || auth.uid === 'zzzz')",
+        ".read": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
+        ".write": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || root.child('groups').child($groupId).child('admins').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
         "messages": {
           ".indexOn": ["timestamp"],
-          ".read": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')",
-          ".write": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'zzzz')"
+          ".read": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
+          ".write": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')"
         }
       }
     },
@@ -52,9 +52,9 @@
     },
     "announcements": {
       ".read": "auth != null",
-      ".write": "auth != null && auth.uid === 'zzzz'"
+      ".write": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'"
     },
-    ".read": "auth != null && auth.uid === 'zzzz'",
-    ".write": "auth != null && auth.uid === 'zzzz'"
+    ".read": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
+    ".write": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'"
   }
 }
