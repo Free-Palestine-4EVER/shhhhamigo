@@ -827,30 +827,29 @@ export default function ChatWindow({
 
       const metadata = { contentType }
 
-      // Read the entire file into memory first using FileReader
-      // This is critical for iOS Safari which does lazy file loading
-      const fileData: Uint8Array = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => {
-          if (reader.result instanceof ArrayBuffer) {
-            resolve(new Uint8Array(reader.result))
-          } else {
-            reject(new Error("FileReader did not return ArrayBuffer"))
-          }
-        }
-        reader.onerror = () => reject(reader.error)
-        reader.readAsArrayBuffer(file)
-      })
+      // iOS Safari fix: create object URL then fetch it back as blob
+      // This forces the OS to fully materialize the file data in memory
+      // before we hand it to Firebase (iOS lazily loads picked videos)
+      const objectUrl = URL.createObjectURL(file)
+      const response = await fetch(objectUrl)
+      const fileBlob = await response.blob()
+      URL.revokeObjectURL(objectUrl)
 
-      setUploadProgress(20)
+      console.log(`[Upload] File: ${file.name}, original size: ${file.size}, blob size: ${fileBlob.size}, type: ${contentType}`)
 
-      // Upload using resumable with the fully-read data
+      if (fileBlob.size < 1000) {
+        throw new Error(`File appears empty (${fileBlob.size} bytes). Please try again.`)
+      }
+
+      setUploadProgress(15)
+
+      // Upload the blob
       const downloadURL: string = await new Promise<string>((resolve, reject) => {
-        const uploadTask = uploadBytesResumable(fileRef, fileData, metadata)
+        const uploadTask = uploadBytesResumable(fileRef, fileBlob, metadata)
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress = 20 + (snapshot.bytesTransferred / snapshot.totalBytes) * 80
+            const progress = 15 + (snapshot.bytesTransferred / snapshot.totalBytes) * 85
             setUploadProgress(progress)
           },
           (error) => reject(error),
