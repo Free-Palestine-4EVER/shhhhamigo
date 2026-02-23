@@ -807,22 +807,9 @@ export default function ChatWindow({
 
     let fileToUpload = file
 
-    // Compress video before uploading
+    // Skip compression — upload original file directly
     if (isVideo) {
-      try {
-        console.log("Compressing video before upload...")
-        setUploadProgress(5) // Show some initial progress
-        const compressedVideo = await compressVideo(file)
-        fileToUpload = new File([compressedVideo], file.name, { type: compressedVideo.type || file.type })
-        console.log(
-          `Video compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`,
-        )
-        setUploadProgress(20) // Show progress after compression
-      } catch (error) {
-        console.error("Error compressing video:", error)
-        console.log("Continuing with original video file")
-        // Continue with the original file if compression fails
-      }
+      console.log(`Uploading video: ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB, type: ${file.type}`)
     }
 
     const fileRef = storageRef(storage, `${fileType}/${selectedChat}/${Date.now()}_${file.name}`)
@@ -832,10 +819,7 @@ export default function ChatWindow({
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        // For videos, start from 20% (after compression) to 100%
-        // For images, start from 0% to 100%
-        const baseProgress = isVideo ? 20 : 0
-        const uploadProgress = baseProgress + (snapshot.bytesTransferred / snapshot.totalBytes) * (100 - baseProgress)
+        const uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         setUploadProgress(uploadProgress)
       },
       (error) => {
