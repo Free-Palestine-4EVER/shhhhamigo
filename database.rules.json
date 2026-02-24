@@ -43,6 +43,11 @@
         }
       }
     },
+    "messages": {
+      ".indexOn": ["timestamp"],
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
     "status": {
       ".read": "auth != null",
       "$userId": {
