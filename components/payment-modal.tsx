@@ -113,22 +113,33 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
     )
   }
 
-  // Listen for payment status changes
+  // Listen for payment status changes — only trust "pending" if an actual payment submission exists
   useEffect(() => {
     if (!user) return
 
     const paymentStatusRef = ref(db, `users/${user.uid}/payment`)
-    const unsubscribe = onValue(paymentStatusRef, (snapshot) => {
+    const paymentSubmissionRef = ref(db, `payments/${user.uid}`)
+
+    const unsubscribe = onValue(paymentStatusRef, async (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val()
-        setPaymentStatus(data.status)
 
         if (data.status === "verified") {
+          setPaymentStatus("verified")
           setIsVerificationComplete(true)
-          // Close modal after 3 seconds when verified
-          setTimeout(() => {
-            onClose()
-          }, 3000)
+          setTimeout(() => { onClose() }, 3000)
+        } else if (data.status === "pending") {
+          // Only show "pending" if user actually submitted a payment
+          const { get } = await import("firebase/database")
+          const submissionSnap = await get(paymentSubmissionRef)
+          if (submissionSnap.exists()) {
+            setPaymentStatus("pending")
+          } else {
+            // No real submission — treat as no payment (show form)
+            setPaymentStatus(null)
+          }
+        } else {
+          setPaymentStatus(data.status)
         }
       }
     })
