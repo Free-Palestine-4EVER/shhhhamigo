@@ -18,6 +18,8 @@ const OneSignalInitializer = dynamic(() => import("@/components/onesignal-initia
 const OneSignalModalManager = dynamic(() => import("@/components/onesignal-modal-manager"), { ssr: false })
 const PaymentModal = dynamic(() => import("@/components/payment-modal"), { ssr: false })
 
+const ADMIN_USER_ID = "RYiUZ6Y2Z1cgtJ7bigmFqge0lox2"
+
 import { db } from "@/lib/firebase"
 import { ref, get, onValue } from "firebase/database"
 import { updateLastAccessTime, setSessionVerified, CURRENT_PASSCODE_VERSION } from "@/lib/passcode-utils"
@@ -62,9 +64,10 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
     }
   }, [user, loading])
 
-  // Check payment status
+  // Check payment status (skip for admin)
   useEffect(() => {
     if (!user || loading) return
+    if (user.uid === ADMIN_USER_ID) { setShowPaymentModal(false); return }
     const userPaymentRef = ref(db, `users/${user.uid}/payment`)
     const unsubscribe = onValue(userPaymentRef, (snapshot) => {
       if (snapshot.exists()) {
