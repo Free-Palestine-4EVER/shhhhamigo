@@ -27,7 +27,7 @@ const AlertDialogOverlay = React.forwardRef<
       right: 0,
       bottom: 0,
       left: 0,
-      zIndex: 50,
+      zIndex: 10010,
       backgroundColor: "rgba(0, 0, 0, 0.8)",
     }}
     {...props}
@@ -53,7 +53,7 @@ const AlertDialogContent = React.forwardRef<
         left: "50%",
         top: "50%",
         transform: "translate(-50%, -50%)",
-        zIndex: 50,
+        zIndex: 10010,
         display: "grid",
         width: "100%",
         maxWidth: "32rem",
