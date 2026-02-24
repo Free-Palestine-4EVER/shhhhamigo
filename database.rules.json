@@ -32,7 +32,7 @@
     },
     "groups": {
       ".indexOn": ["updatedAt"],
-      ".read": "auth != null && auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2'",
+      ".read": "auth != null",
       "$groupId": {
         ".read": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
         ".write": "auth != null && (root.child('groups').child($groupId).child('participants').hasChild(auth.uid) || root.child('groups').child($groupId).child('admins').hasChild(auth.uid) || auth.uid === 'RYiUZ6Y2Z1cgtJ7bigmFqge0lox2')",
