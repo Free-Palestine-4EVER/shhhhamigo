@@ -66,10 +66,13 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
 
   // Check payment status (skip for admin)
   useEffect(() => {
+    console.log("[PAYMENT DEBUG] useEffect fired", { user: !!user, uid: user?.uid, loading })
     if (!user || loading) return
-    if (user.uid === ADMIN_USER_ID) { setShowPaymentModal(false); return }
+    if (user.uid === ADMIN_USER_ID) { console.log("[PAYMENT DEBUG] admin user, skipping"); setShowPaymentModal(false); return }
     const userPaymentRef = ref(db, `users/${user.uid}/payment`)
+    console.log("[PAYMENT DEBUG] listening to", `users/${user.uid}/payment`)
     const unsubscribe = onValue(userPaymentRef, (snapshot) => {
+      console.log("[PAYMENT DEBUG] onValue fired, exists:", snapshot.exists(), "val:", snapshot.val())
       if (snapshot.exists()) {
         const data = snapshot.val()
         if (data.status === "verified") {
@@ -77,18 +80,23 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
           if (data.expiresAt) {
             const expiry = new Date(data.expiresAt)
             if (expiry <= new Date() && data.plan !== "lifetime") {
+              console.log("[PAYMENT DEBUG] expired, showing modal")
               setShowPaymentModal(true)
             } else {
+              console.log("[PAYMENT DEBUG] verified & not expired, hiding modal")
               setShowPaymentModal(false)
             }
           } else {
+            console.log("[PAYMENT DEBUG] verified no expiry, hiding modal")
             setShowPaymentModal(false)
           }
         } else {
+          console.log("[PAYMENT DEBUG] status not verified:", data.status, "showing modal")
           setShowPaymentModal(true)
         }
       } else {
         // No payment data — show modal
+        console.log("[PAYMENT DEBUG] no payment data, showing modal")
         setShowPaymentModal(true)
       }
     })
@@ -134,7 +142,9 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
             <ServerSelectionModal isOpen={showServerSelection} onServerSelect={(id: string) => { setSelectedServer(id); setShowServerSelection(false) }} />
             <OneSignalInitializer />
             <OneSignalModalManager />
+            {console.log("[PAYMENT DEBUG] render, showPaymentModal:", showPaymentModal)}
             <PaymentModal isOpen={showPaymentModal} onClose={() => setShowPaymentModal(false)} />
+            {showPaymentModal && <div style={{position:'fixed',top:0,left:0,background:'red',color:'white',zIndex:99999,padding:'10px',fontSize:'20px'}}>PAYMENT MODAL SHOULD BE VISIBLE</div>}
           </>
         )}
       </div>
