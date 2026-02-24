@@ -113,14 +113,12 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
     )
   }
 
-  // Listen for payment status changes — only trust "pending" if an actual payment submission exists
+  // Listen for payment status changes — only trust "pending" if user actually submitted (has submittedAt flag)
   useEffect(() => {
     if (!user) return
 
     const paymentStatusRef = ref(db, `users/${user.uid}/payment`)
-    const paymentSubmissionRef = ref(db, `payments/${user.uid}`)
-
-    const unsubscribe = onValue(paymentStatusRef, async (snapshot) => {
+    const unsubscribe = onValue(paymentStatusRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val()
 
@@ -128,18 +126,14 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
           setPaymentStatus("verified")
           setIsVerificationComplete(true)
           setTimeout(() => { onClose() }, 3000)
-        } else if (data.status === "pending") {
-          // Only show "pending" if user actually submitted a payment
-          const { get } = await import("firebase/database")
-          const submissionSnap = await get(paymentSubmissionRef)
-          if (submissionSnap.exists()) {
-            setPaymentStatus("pending")
-          } else {
-            // No real submission — treat as no payment (show form)
-            setPaymentStatus(null)
-          }
+        } else if (data.status === "pending" && data.submittedAt) {
+          // Only show pending if they actually submitted payment
+          setPaymentStatus("pending")
+        } else if (data.status === "rejected") {
+          setPaymentStatus("rejected")
         } else {
-          setPaymentStatus(data.status)
+          // Stale/bogus pending record with no submission — show payment form
+          setPaymentStatus(null)
         }
       }
     })
@@ -183,6 +177,7 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
         planName: selectedPlan.name,
         duration: selectedPlan.duration,
         expiresAt: new Date(Date.now() + selectedPlan.duration * 24 * 60 * 60 * 1000).toISOString(),
+        submittedAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })
 
