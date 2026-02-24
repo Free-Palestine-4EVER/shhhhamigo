@@ -16,9 +16,10 @@ const PasscodeScreen = dynamic(() => import("@/components/passcode-screen"), { s
 const PasscodeSetup = dynamic(() => import("@/components/passcode-setup"), { ssr: false })
 const OneSignalInitializer = dynamic(() => import("@/components/onesignal-initializer"), { ssr: false })
 const OneSignalModalManager = dynamic(() => import("@/components/onesignal-modal-manager"), { ssr: false })
+const PaymentModal = dynamic(() => import("@/components/payment-modal"), { ssr: false })
 
 import { db } from "@/lib/firebase"
-import { ref, get } from "firebase/database"
+import { ref, get, onValue } from "firebase/database"
 import { updateLastAccessTime, setSessionVerified, CURRENT_PASSCODE_VERSION } from "@/lib/passcode-utils"
 
 function SecretChatInner({ onClose }: { onClose: () => void }) {
@@ -28,6 +29,7 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
   const [showPasscode, setShowPasscode] = useState(false)
   const [showPasscodeSetup, setShowPasscodeSetup] = useState(false)
   const [passcodeVerified, setPasscodeVerified] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
 
   useEffect(() => {
     setSessionVerified(false)
@@ -58,6 +60,36 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
         updateLastAccessTime()
       })
     }
+  }, [user, loading])
+
+  // Check payment status
+  useEffect(() => {
+    if (!user || loading) return
+    const userPaymentRef = ref(db, `users/${user.uid}/payment`)
+    const unsubscribe = onValue(userPaymentRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val()
+        if (data.status === "verified") {
+          // Check expiry
+          if (data.expiresAt) {
+            const expiry = new Date(data.expiresAt)
+            if (expiry <= new Date() && data.plan !== "lifetime") {
+              setShowPaymentModal(true)
+            } else {
+              setShowPaymentModal(false)
+            }
+          } else {
+            setShowPaymentModal(false)
+          }
+        } else {
+          setShowPaymentModal(true)
+        }
+      } else {
+        // No payment data — show modal
+        setShowPaymentModal(true)
+      }
+    })
+    return () => unsubscribe()
   }, [user, loading])
 
   useEffect(() => {
@@ -99,6 +131,7 @@ function SecretChatInner({ onClose }: { onClose: () => void }) {
             <ServerSelectionModal isOpen={showServerSelection} onServerSelect={(id: string) => { setSelectedServer(id); setShowServerSelection(false) }} />
             <OneSignalInitializer />
             <OneSignalModalManager />
+            <PaymentModal isOpen={showPaymentModal} onClose={() => setShowPaymentModal(false)} />
           </>
         )}
       </div>
