@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: "onboarding@resend.dev", // Using Resend's default domain
-      to: "zzeidnaser@gmail.com", // Your email address
+      to: "matejcveta@gmail.com", // Admin email address
       subject: `New User Registration: ${username}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
