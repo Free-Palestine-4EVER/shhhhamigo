@@ -634,7 +634,8 @@ export default function Sidebar({
               <>
                 {chats.map((chat) => {
                   // Simplified participant finding
-                  const otherParticipantId = chat.participants.find((id) => id !== currentUser?.id)
+                  const participants = Array.isArray(chat.participants) ? chat.participants : Object.keys(chat.participants || {})
+                  const otherParticipantId = participants.find((id) => id !== currentUser?.id)
                   const otherUser = users.find((u) => u.id === otherParticipantId)
 
                   return (
