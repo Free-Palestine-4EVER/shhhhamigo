@@ -374,34 +374,35 @@ export default function ChatWindow({
                 }
 
                 const expirationMs = getExpirationMs(autoDeleteAfter)
+                const now = Date.now()
 
                 messagesData.forEach((message) => {
+                  const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+
                   if (isGroup) {
-                    // For groups, verify readBy
+                    // For groups, mark as read by this user
                     if (!message.readBy || !message.readBy[currentUser.id]) {
-                      const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
                       const updateData: any = {
                         [`readBy.${currentUser.id}`]: true,
                       }
 
-                      // Set readAt and expiresAt if auto-delete is enabled and message hasn't been read before
-                      if (expirationMs && !message.readAt) {
-                        const now = Date.now()
+                      // Set expiresAt on ALL messages (not just unread) when auto-delete is enabled
+                      if (expirationMs && !message.expiresAt) {
                         updateData.readAt = now
                         updateData.expiresAt = now + expirationMs
                       }
 
                       update(messageRef, updateData).catch((err) => console.error("Error marking group message as read:", err))
+                    } else if (expirationMs && !message.expiresAt) {
+                      // Already read but no expiresAt — set it now (e.g. timer enabled after messages were sent)
+                      update(messageRef, { readAt: message.readAt || now, expiresAt: now + expirationMs }).catch((err) => console.error("Error setting expiry:", err))
                     }
                   } else {
-                    // For direct chats, use the read flag
+                    // For direct chats — mark incoming as read
                     if (message.receiverId === currentUser.id && !message.read) {
-                      const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
                       const updateData: any = { read: true }
 
-                      // Set readAt and expiresAt if auto-delete is enabled
-                      if (expirationMs && !message.readAt) {
-                        const now = Date.now()
+                      if (expirationMs && !message.expiresAt) {
                         updateData.readAt = now
                         updateData.expiresAt = now + expirationMs
                       }
@@ -410,11 +411,21 @@ export default function ChatWindow({
                         console.error("Error marking message as read:", err),
                       )
                     }
+
+                    // For ALL messages (sent AND received): if auto-delete is on and no expiresAt yet, set it
+                    // This ensures sender's own messages also get expiry
+                    if (expirationMs && !message.expiresAt) {
+                      // Only set expiry on messages that are "seen" by the other party, OR on sender's own messages
+                      const isMine = message.senderId === currentUser.id
+                      const isRead = message.read || message.readAt
+                      if (isMine || isRead) {
+                        update(messageRef, { readAt: message.readAt || now, expiresAt: now + expirationMs }).catch((err) => console.error("Error setting expiry:", err))
+                      }
+                    }
                   }
 
-                  // Delete expired messages
-                  if (message.expiresAt && message.expiresAt < Date.now()) {
-                    const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+                  // Delete expired messages immediately
+                  if (message.expiresAt && message.expiresAt < now) {
                     remove(messageRef).catch((err) => console.error("Error deleting expired message:", err))
                   }
                 })
@@ -698,6 +709,26 @@ export default function ChatWindow({
         messageData.read = false
       }
 
+      // If auto-delete is enabled, set expiresAt on the new message immediately
+      // The sender sees their own message, so the timer starts now
+      if (autoDeleteSetting && autoDeleteSetting !== "never") {
+        const getExpirationMs = (setting: string): number | null => {
+          switch (setting) {
+            case "1m": return 60 * 1000
+            case "5m": return 5 * 60 * 1000
+            case "1h": return 60 * 60 * 1000
+            case "24h": return 24 * 60 * 60 * 1000
+            default: return null
+          }
+        }
+        const expirationMs = getExpirationMs(autoDeleteSetting)
+        if (expirationMs) {
+          const now = Date.now()
+          messageData.readAt = now
+          messageData.expiresAt = now + expirationMs
+        }
+      }
+
       await set(newMessageRef, messageData)
 
       // Update last message in chat/group - FIXED: Don't include receiverId for groups
@@ -941,6 +972,16 @@ export default function ChatWindow({
         messageData.read = false
       }
 
+      // Auto-delete timer for media messages
+      if (autoDeleteSetting && autoDeleteSetting !== "never") {
+        const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[autoDeleteSetting]
+        if (expMs) {
+          const now = Date.now()
+          messageData.readAt = now
+          messageData.expiresAt = now + expMs
+        }
+      }
+
       await set(newMessageRef, messageData)
 
       // Update last message
@@ -1101,6 +1142,16 @@ export default function ChatWindow({
               // For direct chats, set receiverId and read status
               messageData.receiverId = selectedUser?.id
               messageData.read = false
+            }
+
+            // Auto-delete timer for voice messages
+            if (autoDeleteSetting && autoDeleteSetting !== "never") {
+              const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[autoDeleteSetting]
+              if (expMs) {
+                const now = Date.now()
+                messageData.readAt = now
+                messageData.expiresAt = now + expMs
+              }
             }
 
             await set(newMessageRef, messageData)
@@ -1802,6 +1853,11 @@ export default function ChatWindow({
                                         : "✓"}
                                 </span>
                               )}
+                              {message.expiresAt && (
+                                <span className="ml-1.5 opacity-60" title="Disappearing message">
+                                  <Timer className="h-3 w-3 inline" />
+                                </span>
+                              )}
                             </span>
                           </div>
                         </div>
@@ -1861,6 +1917,11 @@ export default function ChatWindow({
                                         : "✓"}
                                 </span>
                               )}
+                              {message.expiresAt && (
+                                <span className="ml-1.5 opacity-60" title="Disappearing message">
+                                  <Timer className="h-3 w-3 inline" />
+                                </span>
+                              )}
                             </span>
                           </div>
                         </div>
@@ -1916,6 +1977,11 @@ export default function ChatWindow({
                                       : message.read
                                         ? "✓✓"
                                         : "✓"}
+                                </span>
+                              )}
+                              {message.expiresAt && (
+                                <span className="ml-1.5 opacity-60" title="Disappearing message">
+                                  <Timer className="h-3 w-3 inline" />
                                 </span>
                               )}
                             </span>
@@ -1976,6 +2042,11 @@ export default function ChatWindow({
                                       : message.read
                                         ? "✓✓"
                                         : "✓"}
+                                </span>
+                              )}
+                              {message.expiresAt && (
+                                <span className="ml-1.5 opacity-60" title="Disappearing message">
+                                  <Timer className="h-3 w-3 inline" />
                                 </span>
                               )}
                             </span>
