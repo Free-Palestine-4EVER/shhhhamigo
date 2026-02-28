@@ -355,21 +355,41 @@ export default function ChatWindow({
               }
             }
 
-            // Mark messages as read (minimal updates to avoid retriggering onValue loop)
+            // Mark messages as read and set expiresAt when recipient READS
             if (currentUser) {
-              messagesData.forEach((message) => {
-                if (isGroup) {
-                  if (!message.readBy || !message.readBy[currentUser.id]) {
-                    const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
-                    update(messageRef, { [`readBy.${currentUser.id}`]: true }).catch((err) => console.error("Error marking group message as read:", err))
+              // Get auto-delete setting once
+              const chatSettingRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}/autoDeleteAfter`)
+              get(chatSettingRef).then((snap) => {
+                const setting = snap.val() || "never"
+                const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[setting] || null
+
+                messagesData.forEach((message) => {
+                  if (isGroup) {
+                    if (!message.readBy || !message.readBy[currentUser.id]) {
+                      const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+                      const updateData: any = { [`readBy.${currentUser.id}`]: true }
+                      // Set expiresAt only on first read, only if not already set
+                      if (expMs && !message.expiresAt) {
+                        const now = Date.now()
+                        updateData.readAt = now
+                        updateData.expiresAt = now + expMs
+                      }
+                      update(messageRef, updateData).catch((err) => console.error("Error marking group message as read:", err))
+                    }
+                  } else {
+                    // Only mark messages sent TO me as read
+                    if (message.receiverId === currentUser.id && !message.read) {
+                      const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+                      const updateData: any = { read: true, readAt: Date.now() }
+                      // Start the disappearing timer NOW — this is the moment the recipient sees it
+                      if (expMs && !message.expiresAt) {
+                        updateData.expiresAt = Date.now() + expMs
+                      }
+                      update(messageRef, updateData).catch((err) => console.error("Error marking message as read:", err))
+                    }
                   }
-                } else {
-                  if (message.receiverId === currentUser.id && !message.read) {
-                    const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
-                    update(messageRef, { read: true }).catch((err) => console.error("Error marking message as read:", err))
-                  }
-                }
-              })
+                })
+              }).catch(() => {})
             }
           } else {
             setMessages([])
@@ -533,13 +553,14 @@ export default function ChatWindow({
               continue
             }
 
-            // Stamp expiresAt on messages that don't have it yet (when timer is enabled)
+            // Stamp expiresAt on messages that have been READ but don't have expiresAt yet
+            // Timer only starts after the message is seen by the recipient
             if (expMs && !msg.expiresAt) {
               const isRead = isGroup ? (msg.readBy && Object.keys(msg.readBy).length > 1) : (msg.read || msg.readAt)
-              const isSenderOnline = msg.senderId === currentUser?.id
-              if (isRead || isSenderOnline) {
+              if (isRead) {
                 const messageRef = dbRef(db, `messages/${selectedChat}/${messageId}`)
-                await update(messageRef, { readAt: msg.readAt || now, expiresAt: now + expMs })
+                const readTime = msg.readAt || now
+                await update(messageRef, { readAt: readTime, expiresAt: readTime + expMs })
               }
             }
           }
@@ -668,25 +689,7 @@ export default function ChatWindow({
         messageData.read = false
       }
 
-      // If auto-delete is enabled, set expiresAt on the new message immediately
-      // The sender sees their own message, so the timer starts now
-      if (autoDeleteSetting && autoDeleteSetting !== "never") {
-        const getExpirationMs = (setting: string): number | null => {
-          switch (setting) {
-            case "1m": return 60 * 1000
-            case "5m": return 5 * 60 * 1000
-            case "1h": return 60 * 60 * 1000
-            case "24h": return 24 * 60 * 60 * 1000
-            default: return null
-          }
-        }
-        const expirationMs = getExpirationMs(autoDeleteSetting)
-        if (expirationMs) {
-          const now = Date.now()
-          messageData.readAt = now
-          messageData.expiresAt = now + expirationMs
-        }
-      }
+      // Don't set expiresAt on send — timer starts only when recipient READS the message
 
       await set(newMessageRef, messageData)
 
@@ -931,15 +934,7 @@ export default function ChatWindow({
         messageData.read = false
       }
 
-      // Auto-delete timer for media messages
-      if (autoDeleteSetting && autoDeleteSetting !== "never") {
-        const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[autoDeleteSetting]
-        if (expMs) {
-          const now = Date.now()
-          messageData.readAt = now
-          messageData.expiresAt = now + expMs
-        }
-      }
+      // Don't set expiresAt on send — timer starts only when recipient READS
 
       await set(newMessageRef, messageData)
 
@@ -1103,15 +1098,7 @@ export default function ChatWindow({
               messageData.read = false
             }
 
-            // Auto-delete timer for voice messages
-            if (autoDeleteSetting && autoDeleteSetting !== "never") {
-              const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[autoDeleteSetting]
-              if (expMs) {
-                const now = Date.now()
-                messageData.readAt = now
-                messageData.expiresAt = now + expMs
-              }
-            }
+            // Don't set expiresAt on send — timer starts only when recipient READS
 
             await set(newMessageRef, messageData)
 
