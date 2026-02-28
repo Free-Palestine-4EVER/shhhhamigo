@@ -2114,24 +2114,24 @@ export default function ChatWindow({
                     <Timer className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 rounded-xl border" style={{
-                  background: 'rgba(30, 30, 30, 0.95)',
-                  borderColor: 'rgba(255, 255, 255, 0.08)',
+                <DropdownMenuContent side="top" align="end" sideOffset={8} className="w-48 rounded-xl border z-[9999]" style={{
+                  background: 'rgba(30, 30, 30, 0.98)',
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
                   backdropFilter: 'blur(20px)'
                 }}>
-                  <DropdownMenuItem onClick={() => handleAutoDeleteChange("never")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
+                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("never")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
                     Off {autoDeleteSetting === "never" && "✓"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAutoDeleteChange("1m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
+                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("1m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
                     1 min {autoDeleteSetting === "1m" && "✓"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAutoDeleteChange("5m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
+                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("5m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
                     5 min {autoDeleteSetting === "5m" && "✓"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAutoDeleteChange("1h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
+                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("1h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
                     1 hour {autoDeleteSetting === "1h" && "✓"}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAutoDeleteChange("24h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
+                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("24h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
                     24 hours {autoDeleteSetting === "24h" && "✓"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
