@@ -107,6 +107,7 @@ export default function ChatWindow({
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false) // New state for delete confirmation dialog
   const [autoDeleteSetting, setAutoDeleteSetting] = useState<string>("never")
+  const [showTimerMenu, setShowTimerMenu] = useState(false)
   const prevMessageCountRef = useRef(0) // Track previous message count to detect new messages
 
   // Enhanced scroll to bottom function with retry mechanism
@@ -2093,49 +2094,62 @@ export default function ChatWindow({
                 />
               </div>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className={`rounded-xl h-11 w-11 p-0 flex-shrink-0 transition-all duration-300 border-none ${autoDeleteSetting !== "never"
-                      ? "text-white"
-                      : "text-slate-300"
-                      }`}
-                    style={{
-                      background: autoDeleteSetting !== "never"
-                        ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(249, 115, 22, 0.9) 100%)'
-                        : 'linear-gradient(180deg, rgb(56, 56, 56) 0%, rgb(36, 36, 36) 66%, rgb(41, 41, 41) 100%)',
-                      boxShadow: autoDeleteSetting !== "never"
-                        ? '0 4px 12px rgba(239, 68, 68, 0.3)'
-                        : '0 2px 8px rgba(0, 0, 0, 0.3)'
-                    }}
-                  >
-                    <Timer className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="end" sideOffset={8} className="w-48 rounded-xl border z-[9999]" style={{
-                  background: 'rgba(30, 30, 30, 0.98)',
-                  borderColor: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(20px)'
-                }}>
-                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("never")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
-                    Off {autoDeleteSetting === "never" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("1m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
-                    1 min {autoDeleteSetting === "1m" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("5m")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
-                    5 min {autoDeleteSetting === "5m" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("1h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
-                    1 hour {autoDeleteSetting === "1h" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => handleAutoDeleteChange("24h")} className="focus:bg-slate-700/50 text-slate-200 cursor-pointer rounded-lg">
-                    24 hours {autoDeleteSetting === "24h" && "✓"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowTimerMenu(!showTimerMenu)
+                  }}
+                  className={`rounded-xl h-11 w-11 p-0 flex-shrink-0 transition-all duration-300 border-none flex items-center justify-center ${autoDeleteSetting !== "never"
+                    ? "text-white"
+                    : "text-slate-300"
+                    }`}
+                  style={{
+                    background: autoDeleteSetting !== "never"
+                      ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(249, 115, 22, 0.9) 100%)'
+                      : 'linear-gradient(180deg, rgb(56, 56, 56) 0%, rgb(36, 36, 36) 66%, rgb(41, 41, 41) 100%)',
+                    boxShadow: autoDeleteSetting !== "never"
+                      ? '0 4px 12px rgba(239, 68, 68, 0.3)'
+                      : '0 2px 8px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
+                  <Timer className="h-4 w-4" />
+                </button>
+                {showTimerMenu && (
+                  <>
+                    <div className="fixed inset-0 z-[9998]" onClick={() => setShowTimerMenu(false)} />
+                    <div className="absolute bottom-14 right-0 w-48 rounded-xl border p-1 z-[9999]" style={{
+                      background: 'rgba(30, 30, 30, 0.98)',
+                      borderColor: 'rgba(255, 255, 255, 0.15)',
+                      backdropFilter: 'blur(20px)'
+                    }}>
+                      {[
+                        { value: "never", label: "Off" },
+                        { value: "1m", label: "1 min" },
+                        { value: "5m", label: "5 min" },
+                        { value: "1h", label: "1 hour" },
+                        { value: "24h", label: "24 hours" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handleAutoDeleteChange(opt.value)
+                            setShowTimerMenu(false)
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-slate-200 hover:bg-slate-700/50 rounded-lg cursor-pointer"
+                        >
+                          {opt.label} {autoDeleteSetting === opt.value && "✓"}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
 
               <Button
                 onClick={handleSendMessage}
