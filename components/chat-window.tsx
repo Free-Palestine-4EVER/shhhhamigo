@@ -354,82 +354,21 @@ export default function ChatWindow({
               }
             }
 
-            // Mark messages as read and set auto-delete timer
+            // Mark messages as read (minimal updates to avoid retriggering onValue loop)
             if (currentUser) {
-              // Get chat's auto-delete setting
-              const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
-              get(chatRef).then((chatSnapshot) => {
-                const chatData = chatSnapshot.val()
-                const autoDeleteAfter = chatData?.autoDeleteAfter || "never"
-
-                // Calculate expiration time based on setting
-                const getExpirationMs = (setting: string): number | null => {
-                  switch (setting) {
-                    case "1m": return 60 * 1000
-                    case "5m": return 5 * 60 * 1000
-                    case "1h": return 60 * 60 * 1000
-                    case "24h": return 24 * 60 * 60 * 1000
-                    default: return null
+              messagesData.forEach((message) => {
+                if (isGroup) {
+                  if (!message.readBy || !message.readBy[currentUser.id]) {
+                    const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+                    update(messageRef, { [`readBy.${currentUser.id}`]: true }).catch((err) => console.error("Error marking group message as read:", err))
+                  }
+                } else {
+                  if (message.receiverId === currentUser.id && !message.read) {
+                    const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
+                    update(messageRef, { read: true }).catch((err) => console.error("Error marking message as read:", err))
                   }
                 }
-
-                const expirationMs = getExpirationMs(autoDeleteAfter)
-                const now = Date.now()
-
-                messagesData.forEach((message) => {
-                  const messageRef = dbRef(db, `messages/${selectedChat}/${message.id}`)
-
-                  if (isGroup) {
-                    // For groups, mark as read by this user
-                    if (!message.readBy || !message.readBy[currentUser.id]) {
-                      const updateData: any = {
-                        [`readBy.${currentUser.id}`]: true,
-                      }
-
-                      // Set expiresAt on ALL messages (not just unread) when auto-delete is enabled
-                      if (expirationMs && !message.expiresAt) {
-                        updateData.readAt = now
-                        updateData.expiresAt = now + expirationMs
-                      }
-
-                      update(messageRef, updateData).catch((err) => console.error("Error marking group message as read:", err))
-                    } else if (expirationMs && !message.expiresAt) {
-                      // Already read but no expiresAt — set it now (e.g. timer enabled after messages were sent)
-                      update(messageRef, { readAt: message.readAt || now, expiresAt: now + expirationMs }).catch((err) => console.error("Error setting expiry:", err))
-                    }
-                  } else {
-                    // For direct chats — mark incoming as read
-                    if (message.receiverId === currentUser.id && !message.read) {
-                      const updateData: any = { read: true }
-
-                      if (expirationMs && !message.expiresAt) {
-                        updateData.readAt = now
-                        updateData.expiresAt = now + expirationMs
-                      }
-
-                      update(messageRef, updateData).catch((err) =>
-                        console.error("Error marking message as read:", err),
-                      )
-                    }
-
-                    // For ALL messages (sent AND received): if auto-delete is on and no expiresAt yet, set it
-                    // This ensures sender's own messages also get expiry
-                    if (expirationMs && !message.expiresAt) {
-                      // Only set expiry on messages that are "seen" by the other party, OR on sender's own messages
-                      const isMine = message.senderId === currentUser.id
-                      const isRead = message.read || message.readAt
-                      if (isMine || isRead) {
-                        update(messageRef, { readAt: message.readAt || now, expiresAt: now + expirationMs }).catch((err) => console.error("Error setting expiry:", err))
-                      }
-                    }
-                  }
-
-                  // Delete expired messages immediately
-                  if (message.expiresAt && message.expiresAt < now) {
-                    remove(messageRef).catch((err) => console.error("Error deleting expired message:", err))
-                  }
-                })
-              }).catch((err) => console.error("Error getting chat settings:", err))
+              })
             }
           } else {
             setMessages([])
@@ -575,13 +514,32 @@ export default function ChatWindow({
           const messagesData = snapshot.val()
           let deletedCount = 0
 
+          // Also get the chat's auto-delete setting to stamp missing expiresAt
+          const chatSettingRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}/autoDeleteAfter`)
+          const settingSnap = await get(chatSettingRef)
+          const autoDelete = settingSnap.val() || "never"
+          const expMs = { "1m": 60000, "5m": 300000, "1h": 3600000, "24h": 86400000 }[autoDelete] || null
+
           for (const [messageId, message] of Object.entries(messagesData)) {
             const msg = message as any
+            
+            // Delete expired messages
             if (msg.expiresAt && msg.expiresAt < now) {
               const messageRef = dbRef(db, `messages/${selectedChat}/${messageId}`)
               await remove(messageRef)
               deletedCount++
-              console.log(`Auto-deleted expired message ${messageId} (expired at: ${new Date(msg.expiresAt).toISOString()}, now: ${new Date(now).toISOString()})`)
+              console.log(`Auto-deleted expired message ${messageId}`)
+              continue
+            }
+
+            // Stamp expiresAt on messages that don't have it yet (when timer is enabled)
+            if (expMs && !msg.expiresAt) {
+              const isRead = isGroup ? (msg.readBy && Object.keys(msg.readBy).length > 1) : (msg.read || msg.readAt)
+              const isSenderOnline = msg.senderId === currentUser?.id
+              if (isRead || isSenderOnline) {
+                const messageRef = dbRef(db, `messages/${selectedChat}/${messageId}`)
+                await update(messageRef, { readAt: msg.readAt || now, expiresAt: now + expMs })
+              }
             }
           }
 
