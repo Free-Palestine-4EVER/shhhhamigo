@@ -496,12 +496,8 @@ export default function ChatWindow({
                 if (!msg.readAt) updates[`${msgId}/readAt`] = effectiveReadTime
               }
 
-              // If already expired according to NEW timer, delete immediately?
-              // The update logic above sets the expiry. separate cleanup process or simultaneous check?
-              // Let's delete immediately if expired to provide instant feedback
-              if (newExpiresAt < now) {
-                updates[msgId] = null // Delete
-              }
+              // Don't delete here — let the periodic cleanup handle expired messages.
+              // Deleting inline caused race conditions where the chat itself got nuked.
             } else {
               // If setting is "never", remove expiry
               if (msg.expiresAt) {
@@ -565,22 +561,10 @@ export default function ChatWindow({
             }
           }
 
-          // Check if all messages were deleted
+          // Note: We do NOT delete the chat entry when all messages expire.
+          // The chat should persist so users can still find and use it.
           if (deletedCount > 0) {
-            const remainingSnapshot = await get(messagesRef)
-
-            if (!remainingSnapshot.exists() || Object.keys(remainingSnapshot.val() || {}).length === 0) {
-              // No messages left - delete the entire chat
-              console.log(`All messages deleted, removing chat ${selectedChat}`)
-
-              const chatRef = dbRef(db, `${isGroup ? "groups" : "chats"}/${selectedChat}`)
-              await remove(chatRef)
-
-              // Also remove the messages node
-              await remove(messagesRef)
-
-              console.log(`Chat ${selectedChat} completely removed`)
-            }
+            console.log(`Auto-deleted ${deletedCount} expired message(s) from ${selectedChat}`)
           }
         }
       } catch (error) {
